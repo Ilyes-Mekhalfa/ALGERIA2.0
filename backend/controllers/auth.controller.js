@@ -4,7 +4,7 @@ import UserService from '../services/user.services.js';
 import jwt from 'jsonwebtoken';
 import { addToBlacklist } from '../utils/tokenBlacklist.js';
 import { validateUserData, validateLoginData, hasValidationErrors } from '../utils/validation.js';
-
+import { sendEmail } from '../utils/email.js';
 
 export const register = catchError(async (req, res, next) => {
 
@@ -76,4 +76,42 @@ export const logout = catchError(async (req, res) => {
     return res.status(200).json({ success: true, message: 'Logged out' });
 });
 
-export default { register, login, logout };
+export const forgotPassword = catchError(async (req, res, next)=>{
+    //get the user from the db
+    const {email} = req.body
+
+    const user = await UserService.getUserByEmail(email);
+
+    //create the reset token for the user
+    const resetToken = user.createResetToken();
+    await user.save({validateBeforeSave : false})
+
+    //sending the token to the user 
+    const URL = `http://localhost:5173/resetPassword/${resettoken}`//react app url
+    // send the email
+
+    const message = `forgot password please follow this link to reset your password ${URL} \n if you didnt please ignore this message`
+    // send the email
+    await nodemail({
+        email : user.email,
+        subject : 'verification Code',
+        message
+    })
+     
+
+    res.status(200).json({
+        success : true
+    })
+
+})
+
+export const resetPassword = catchError(async(req , res , next)=>{
+    const {token} = req.params
+
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
+
+    //get the user basedon token
+    const user = await UserService.getUserByToken(hashedToken)
+     
+
+})

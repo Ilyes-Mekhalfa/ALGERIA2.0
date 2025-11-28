@@ -87,6 +87,24 @@ class UserService {
     return user;
   }
 
+  async getUserByEmail(userEmail) {
+    const user = await User.findById(userEmail);
+
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    return user;
+  }
+
+  async getUserByToken(token){
+    const user = await User.findOne({ resetPasswordToken: token , resetPasswordExpire : {$gt : Date.now()} });
+
+    if(!user){
+        throw new AppError('Invalid or expired password reset token', 400)
+    }
+    return user
+  }
   async updateUser(userId, updates) {
     // Remove fields that shouldn't be updated directly
     delete updates.password;
@@ -149,5 +167,4 @@ class UserService {
   }
 }
 
-// Export a singleton instance so callers can do `UserService.register(...)`
 export default new UserService();
