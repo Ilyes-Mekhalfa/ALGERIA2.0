@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
+import useAuthStore from "../../store/authStore";
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -11,7 +13,7 @@ export default function SignUpPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
+  const setUser = useAuthStore((s) => s.setUser);
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -54,22 +56,18 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch("/api/auth/signup", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({
-      //     fullName: formData.fullName,
-      //     email: formData.email,
-      //     password: formData.password,
-      //   }),
-      // });
-
-      // Simulated registration - remove this in production
-      localStorage.setItem("authToken", "mock-token");
-      navigate("/admin/dashboard");
+      const res = await api.register(formData.fullName, formData.email, formData.password);
+      const user = res?.data;
+      if (user) {
+        setUser(user);
+        navigate("/admin/dashboard");
+      } else {
+        setErrors({ submit: "Registration failed" });
+      }
     } catch (err) {
-      setErrors({ submit: "An error occurred during sign up" });
+      const e: any = err;
+      const msg = e?.response?.data?.message || "An error occurred during sign up";
+      setErrors({ submit: msg });
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -175,7 +173,7 @@ export default function SignUpPage() {
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
             Already have an account?{" "}
-            <a href="/auth/signin" className="text-primary font-semibold hover:underline">
+            <a href="/signin" className="text-primary font-semibold hover:underline">
               Sign In
             </a>
           </p>
