@@ -15,6 +15,11 @@ const OrderSchema = new mongoose.Schema({
         type : array,
         default: [],
         required : [true , 'at least should have a product']
+    },
+    status : {
+        type : String,
+        enum : ['pending', 'shipped', 'delivered', 'cancelled'],
+        default : 'pending'
     }
 })
 
