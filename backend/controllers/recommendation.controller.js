@@ -1,4 +1,4 @@
-import catchError from '../utils/catchError.js'
+import {catchError} from '../utils/catchError.js'
 import RecommendationService from '../services/recommendationService.js'
 
 
