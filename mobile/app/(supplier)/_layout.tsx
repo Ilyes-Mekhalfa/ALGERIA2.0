@@ -5,6 +5,7 @@ import {
   Home,
   MapPin,
   MessageCircle,
+  Package,
   ShoppingBag,
   User,
 } from "lucide-react-native";
@@ -38,10 +39,18 @@ export default function SupplierLayout() {
       />
 
       <Tabs.Screen
-        name="ProfileScreen"
+        name="market"
         options={{
-          title: "Profile",
-          tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
+          title: "market",
+          tabBarIcon: ({ color, size }) => <ShoppingBag color={color} size={size} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="orders"
+        options={{
+          title: "orders",
+          tabBarIcon: ({ color, size }) => <Package color={color} size={size} />,
         }}
       />
     </Tabs>
