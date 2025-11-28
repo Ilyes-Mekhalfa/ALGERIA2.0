@@ -31,6 +31,12 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+// Ensure clients can read the Authorization header from responses (useful for SPA/mobile)
+app.use((req, res, next) => {
+  res.header('Access-Control-Expose-Headers', 'Authorization');
+  next();
+});
+
 // Security headers
 app.use(helmet({
   contentSecurityPolicy: {

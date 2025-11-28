@@ -1,16 +1,30 @@
 import jwt from 'jsonwebtoken';
 import logger from '../utils/logger.js';
 import { isBlacklisted } from '../utils/tokenBlacklist.js';
+import { verifyToken } from '../utils/jwt.js';
 
 const authenticate = async (req, res, next) => {
   try {
-    // Accept token from Authorization header, cookie, or query param for flexibility
+    // Accept token from common header names, cookie, or query param for flexibility
     let token = null;
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-      token = req.headers.authorization.split(' ')[1];
-    } else if (req.cookies && req.cookies.token) {
+    // log minimal header info for debugging
+    logger.debug && logger.debug('auth headers:', { hasAuthorization: !!req.headers.authorization, cookieToken: !!(req.cookies && req.cookies.token) });
+
+    // Common header variations
+    const authHeader = req.headers.authorization || req.headers.Authorization || req.headers['x-access-token'] || req.headers['token'];
+    if (authHeader) {
+      if (typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+      } else if (typeof authHeader === 'string') {
+        token = authHeader;
+      }
+    }
+
+    // fallback to cookies or query
+    if (!token && req.cookies && req.cookies.token) {
       token = req.cookies.token;
-    } else if (req.query && req.query.token) {
+    }
+    if (!token && req.query && req.query.token) {
       token = req.query.token;
     }
 
@@ -22,8 +36,8 @@ const authenticate = async (req, res, next) => {
       return res.status(401).json({ error: 'Token revoked', message: 'Please login again' });
     }
 
-    const secret = process.env.JWT_SECRET || 'default-secret-key-change-in-production';
-    const decoded = jwt.verify(token, secret);
+    // Use shared jwt helper for verification to keep behavior consistent
+    const decoded = verifyToken(token);
     req.user = decoded;
     next();
   } catch (error) {
