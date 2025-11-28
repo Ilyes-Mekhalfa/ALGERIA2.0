@@ -10,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "@/components/Header";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import HomeGrid from "@/components/HomeGrid";
+import { useRouter } from "expo-router";
 
 const data = [
   { id: 1, title: "Total Earning", value: "45 280 DA" },
@@ -19,6 +20,9 @@ const data = [
 ];
 
 const Index = () => {
+
+  const router = useRouter();
+
   return (
     <SafeAreaView className="flex-1 bg-[#F4FDF6]">
       <StatusBar barStyle="dark-content" />
@@ -38,7 +42,7 @@ const Index = () => {
             <Header />
             <View className="flex-row justify-evenly items-center mt-6 mb-8">
               <Text className="text-3xl font-extrabold">Dashboard</Text>
-              <TouchableOpacity className="flex-row items-center bg-[#50C878] px-5 py-3 rounded-full">
+              <TouchableOpacity onPress={() => router.replace("/new")} className="flex-row items-center bg-[#50C878] px-5 py-3 rounded-full">
                 <Ionicons name="add" size={22} color="#fff" />
                 <Text className="text-white font-semibold ml-1 text-lg">
                   Add Product

@@ -1,4 +1,4 @@
-import api from './axios'; // Adjust this path to where your axios.js file is located
+import api from '../utils/axios'; // Adjust this path to where your axios.js file is located
 
 /**
  * A service object for handling all product-related API requests.
@@ -18,7 +18,9 @@ const productService = {
       // Axios automatically converts the 'params' object into URL query parameters
       // e.g., /products?page=1&limit=10
       const res = await api.get('/products', { params });
-      return res.data;
+      console.log(res.data.data);
+      return res.data.data;
+
     } catch (error) {
       console.error("Error fetching products:", error);
       throw error; // Re-throw the error so the UI component can handle it
