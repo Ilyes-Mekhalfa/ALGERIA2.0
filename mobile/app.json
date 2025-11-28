@@ -43,7 +43,14 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you upload pictures of your products."
+        }
       ]
+      // --- REMOVED from here ---
     ],
     "experiments": {
       "typedRoutes": true,
