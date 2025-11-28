@@ -44,7 +44,7 @@
  })
 export const getMyProducts = catchError(async (req , res , next)=>{
     //get the user
-    const userId = req.body.userId;
+    const userId = req.params.id;
 
     const products = await ProductService.findMany({userId})
 
