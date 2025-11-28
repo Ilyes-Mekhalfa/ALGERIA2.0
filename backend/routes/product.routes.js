@@ -9,6 +9,9 @@ router
      .post(productController.createProduct)
 
 router
+    .route('/my-products/:id')
+    .get(productController.getMyProducts)
+router
     .route('/:id')
     .get( productController.getProduct)
     .patch( productController.updateProduct)

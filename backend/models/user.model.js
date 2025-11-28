@@ -26,6 +26,12 @@ const Userschema = new mongoose.Schema({
             messgae: 'password are not matched'
         }
     },
+    phone : {
+        type: String,
+    },
+    location : {
+        type: String,
+    },
     role : {
         type : String,
         enum : ['admin', 'farmer', 'buyer'],
