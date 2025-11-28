@@ -22,6 +22,7 @@ const icons: Record<string, keyof typeof Feather.glyphMap> = {
   index: "home",
   listings: "package",
   market: "bar-chart-2",
+  profile: "user",
 };
 
 interface TabItemProps {
