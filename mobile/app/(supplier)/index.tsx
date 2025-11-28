@@ -1,12 +1,14 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text } from "react-native";
+import React from "react";
+import Header from "@/components/Header";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const index = () => {
   return (
-    <View>
-      <Text>index</Text>
-    </View>
-  )
-}
+    <SafeAreaView>
+      <Header />
+    </SafeAreaView>
+  );
+};
 
-export default index
+export default index;
