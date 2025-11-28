@@ -3,6 +3,8 @@ import RecombeeService from '../services/recombee.service.js';
 
 export const getRecommendationsForUser = catchError(async (req, res, next) => {
   const { userId } = req.params;
+  console.log(process.env.Recombee_API_KEY , process.env.RECOMBEE_DB_ID);
+  
   const { wilaya, count = 5, diversity = 0.5 } = req.query;
 
   if (!userId) {
@@ -116,14 +118,21 @@ export const trackInteraction = catchError(async (req, res, next) => {
     });
   }
 
-  const weight = interactionType === 'rating' ? (rating || 5) : 1;
+  if (interactionType === 'rating' && (!rating || rating < 1 || rating > 5)) {
+    return res.status(400).json({
+      success: false,
+      message: 'rating must be between 1 and 5'
+    });
+  }
 
-  await RecombeeService.trackInteraction(userId, productId, interactionType, weight);
+  const weight = interactionType === 'rating' ? rating : 1;
+
+  const result = await RecombeeService.trackInteraction(userId, productId, interactionType, weight);
 
   return res.status(200).json({
     success: true,
     message: `${interactionType} tracked successfully`,
-    data: { userId, productId, interactionType }
+    data: result
   });
 });
 
@@ -133,7 +142,7 @@ export const trackInteraction = catchError(async (req, res, next) => {
  * Body: { productId, name, description, wilaya, price, category, ... }
  */
 export const syncProductToRecombee = catchError(async (req, res, next) => {
-  const { productId, name, description, wilaya, price, category } = req.body;
+  const { productId, name, description, wilaya, price, category, available_quantity_kg, quality_grade } = req.body;
 
   if (!productId) {
     return res.status(400).json({
@@ -147,16 +156,17 @@ export const syncProductToRecombee = catchError(async (req, res, next) => {
     description,
     wilaya,
     price,
-    category,
-    // Add any other attributes you want to track
+    product_category: category,
+    available_quantity_kg: available_quantity_kg || 0,
+    quality_grade: quality_grade || 'standard',
   };
 
-  await RecombeeService.upsertProduct(productId, productData);
+  const result = await RecombeeService.upsertProduct(productId, productData);
 
   return res.status(200).json({
     success: true,
     message: 'Product synced to Recombee',
-    data: { productId, ...productData }
+    data: result
   });
 });
 

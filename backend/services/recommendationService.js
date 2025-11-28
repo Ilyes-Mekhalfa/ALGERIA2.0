@@ -1,18 +1,29 @@
-// src/services/recommendationService.js
-import { client } from './recombeeClient.js';
+import recombee  from 'recombee-api-client';
+const rqs = recombee.requests;
 
-export const getRecommendations = async (userId, count = 5) => {
-  try {
-    // Dynamically import requests from recombee-api-client
-    const recombee = await import('recombee-api-client');
-    const requests = await import('recombee-api-client/lib/requests.cjs'); // ✅ correct path
+// Assumed client setup
+// const client = new recombee.ApiClient('YOUR_DB_ID', 'YOUR_PRIVATE_TOKEN'); 
 
-    const { RecommendItemsToUser } = requests;
+async function setupItemProperties(client) {
+    try {
+        // 1. Define Wilaya property
+        await client.send(new rqs.AddItemProperty('wilaya', 'string'));
+        console.log('Added wilaya property.');
+        
+        // 2. Define Quantity property (using double for precise amounts)
+        await client.send(new rqs.AddItemProperty('available_quantity_kg', 'double'));
+        console.log('Added available_quantity_kg property.');
 
-    const response = await client.send(new RecommendItemsToUser(userId, count));
-    return response.recomms.map(r => r.id);
-  } catch (err) {
-    console.error('❌ Recommendation error:', err.message);
-    return [];
-  }
-};
+        // 3. Define Quality property
+        await client.send(new rqs.AddItemProperty('quality_grade', 'string'));
+        console.log('Added quality_grade property.');
+
+        // 4. (Optional but crucial) Define the product type/category
+        await client.send(new rqs.AddItemProperty('product_category', 'string'));
+        console.log('Added product_category property.');
+
+    } catch (error) {
+        // Handle errors, typically property already exists (which is fine)
+        console.error('Error adding properties (may already exist):', error.message);
+    }
+}
