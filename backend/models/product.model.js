@@ -17,6 +17,14 @@ const ProductSchema = new mongoose.Schema({
         type :Number,
         required : [true, 'product must have stock quantity']
     },
+    unit : {
+        type : String,
+        required : [true , 'product must have a unit']
+    },
+    quality : {
+        type : String,
+        required : [true , 'product must have a quality']
+    },
     userId : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'user',

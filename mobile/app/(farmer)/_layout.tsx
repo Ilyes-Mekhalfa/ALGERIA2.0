@@ -35,6 +35,13 @@ export default function TabLayout() {
           title: "Market",
         }}
       />
+
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+        }}
+      />
     </Tabs>
   );
 }

@@ -26,10 +26,10 @@ export default function OrdersTable() {
 
           {orders?.map((row) => (
             <tr key={row.id} className="hover:bg-gray-50">
-              <td className="px-4 py-3 text-sm text-gray-700">{row.buyer}</td>
-              <td className="px-4 py-3 text-sm text-gray-700">{row.product}</td>
-              <td className="px-4 py-3 text-sm text-gray-700">{row.status}</td>
-              <td className="px-4 py-3 text-sm text-gray-700">{row.total} DZD</td>
+              <td className="px-4 py-3 text-left text-sm text-gray-700">{row.buyer}</td>
+              <td className="px-4 py-3 text-left text-sm text-gray-700">{row.product}</td>
+              <td className="px-4 py-3 text-left text-sm text-gray-700">{row.status}</td>
+              <td className="px-4 py-3 text-left text-sm text-gray-700">{row.total} DZD</td>
             </tr>
           ))}
         </tbody>
