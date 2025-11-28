@@ -1,58 +1,23 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Text } from 'react-native';
-import {
-  Home,
-  MapPin,
-  MessageCircle,
-  Package,
-  ShoppingBag,
-  User,
-} from "lucide-react-native";
+import React from "react";
+import { Tabs } from "expo-router";
+import CustomTabBar from "@/components/TabBar2"; // Make sure this path is correct
 
-export default function SupplierLayout() {
+export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: "#2563eb",
-        tabBarStyle: { backgroundColor: "#fff" },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
+    <>
+      <Tabs
+        // 1️⃣ Hides the default standard header (since you have custom headers in screens)
+        screenOptions={{
+          headerShown: false,
         }}
-      />
-
-
-      <Tabs.Screen
-        name="ChatListScreen"
-        options={{
-          title: "Chat",
-          tabBarIcon: ({ color, size }) => (
-            <MessageCircle color={color} size={size} />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="market"
-        options={{
-          title: "market",
-          tabBarIcon: ({ color, size }) => <ShoppingBag color={color} size={size} />,
-        }}
-      />
-
-      <Tabs.Screen
-        name="orders"
-        options={{
-          title: "orders",
-          tabBarIcon: ({ color, size }) => <Package color={color} size={size} />,
-        }}
-      />
-    </Tabs>
+        // 2️⃣ Overrides the default Tab Bar with your Custom Reanimated one
+        tabBar={(props) => <CustomTabBar {...props} />}
+      >
+        <Tabs.Screen name="index" />
+        <Tabs.Screen name="search" />
+        <Tabs.Screen name="orders" />
+        <Tabs.Screen name="profile" />
+      </Tabs>
+    </>
   );
 }
