@@ -8,6 +8,6 @@ const router = express.Router();
  * Get personalized recommendations for a user
  * GET /recommendations/user/:userId?wilaya=Algiers&count=5
  */
-router.get('/user/:userId', recommendationController.getRankedRecommendations);
+router.get('/user', recommendationController.getRankedRecommendations);
 
 export default router
