@@ -9,7 +9,6 @@ export default function ShipmentsTable() {
           <tr>
             <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Shipment ID</th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Order</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Transporter</th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Route</th>
           </tr>
@@ -26,11 +25,10 @@ export default function ShipmentsTable() {
 
           {shipments?.map((row) => (
             <tr key={row.id} className="hover:bg-gray-50">
-              <td className="px-4 py-3 text-sm text-gray-700">{row.id}</td>
-              <td className="px-4 py-3 text-sm text-gray-700">#{row.orderId}</td>
-              <td className="px-4 py-3 text-sm text-gray-700">{row.transporter}</td>
-              <td className="px-4 py-3 text-sm text-gray-700">{row.status}</td>
-              <td className="px-4 py-3 text-sm text-gray-700">{row.pickup} → {row.dropoff}</td>
+              <td className="px-4 py-3 text-left text-sm text-gray-700">{row.id}</td>
+              <td className="px-4 py-3 text-left text-sm text-gray-700">#{row.orderId}</td>
+              <td className="px-4 py-3 text-left text-sm text-gray-700">{row.status}</td>
+              <td className="px-4 py-3 text-left text-sm text-gray-700">{row.pickup} → {row.dropoff}</td>
             </tr>
           ))}
         </tbody>
