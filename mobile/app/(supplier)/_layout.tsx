@@ -1,4 +1,6 @@
-import { Tabs } from "expo-router";
+import { Tabs } from 'expo-router';
+import React from 'react';
+import { Text } from 'react-native';
 import {
   Home,
   MapPin,
@@ -7,7 +9,7 @@ import {
   User,
 } from "lucide-react-native";
 
-export default function Layout() {
+export default function SupplierLayout() {
   return (
     <Tabs
       screenOptions={{
@@ -17,12 +19,13 @@ export default function Layout() {
       }}
     >
       <Tabs.Screen
-        name="home"
+        name="index"
         options={{
           title: "Home",
           tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
         }}
       />
+
 
       <Tabs.Screen
         name="ChatListScreen"
@@ -39,14 +42,6 @@ export default function Layout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
-        }}
-      />
-
-      <Tabs.Screen
-        name="MapScreen"
-        options={{
-          title: "Map",
-          tabBarIcon: ({ color, size }) => <MapPin color={color} size={size} />,
         }}
       />
     </Tabs>
