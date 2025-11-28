@@ -2,6 +2,7 @@ import Product from '../models/product.model.js'
 import { spawn } from 'child_process';
 
 const rankListings = async (userWilaya, userMinQuantity, limit) => {
+    console.log(userWilaya , userMinQuantity);
     
     // --- 1. Hard Filter via Database Query ---
     const hardFilteredListings = await Product.find({
@@ -59,21 +60,46 @@ const rankListings = async (userWilaya, userMinQuantity, limit) => {
     return rankedListings.slice(0, limit);
 };
 
-// Helper function to run Python predict script
+
 async function runPythonPredictScript(features) {
     return new Promise((resolve, reject) => {
-        // Placeholder: if predict.py exists, spawn it. Otherwise return dummy scores.
-        // For now, return scores based on features (simple heuristic)
-        const scores = features.map(f => {
-            const qualityScore = (f.quality_score / 3) * 0.4;
-            const ratingScore = (f.high_seller_rating ? 0.4 : 0.2);
-            const freshnessScore = (f.is_fresh_listing ? 0.2 : 0);
-            return qualityScore + ratingScore + freshnessScore;
+        // 1. Spawn the Python process
+        const pythonProcess = spawn('python3', ['predict.py']); 
+        
+        let data = '';
+        let error = '';
+
+        // 2. Collect the output (the scores)
+        pythonProcess.stdout.on('data', (chunk) => {
+            data += chunk.toString();
         });
-        resolve(scores);
+
+        // 3. Collect errors (for debugging)
+        pythonProcess.stderr.on('data', (chunk) => {
+            error += chunk.toString();
+        });
+
+        // 4. Pass the features to Python via stdin
+        pythonProcess.stdin.write(JSON.stringify(features));
+        pythonProcess.stdin.end();
+
+        // 5. Handle process exit
+        pythonProcess.on('close', (code) => {
+            if (code !== 0) {
+                console.error(`Python script failed with code ${code}. Error: ${error}`);
+                return reject(new Error('Model prediction failed.'));
+            }
+            try {
+                // The Python script prints a JSON array of scores
+                const scores = JSON.parse(data);
+                resolve(scores);
+            } catch (e) {
+                console.error("Failed to parse prediction output:", data);
+                reject(new Error("Invalid output from prediction script."));
+            }
+        });
     });
 }
-
 // Export as a class/object for consistency
 const RecommendationService = {
     rankListings

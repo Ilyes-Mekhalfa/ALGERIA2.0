@@ -20,7 +20,6 @@ const data = [
 ];
 
 const Index = () => {
-
   const router = useRouter();
 
   return (
@@ -42,9 +41,12 @@ const Index = () => {
             <Header />
             <View className="flex-row justify-evenly items-center mt-6 mb-8">
               <Text className="text-3xl font-extrabold">Dashboard</Text>
-              <TouchableOpacity onPress={() => router.replace("/new")} className="flex-row items-center bg-[#50C878] px-5 py-3 rounded-full">
-                <Ionicons name="add" size={22} color="#fff" />
-                <Text className="text-white font-semibold ml-1 text-lg">
+              <TouchableOpacity
+                onPress={() => router.replace("/new")}
+                className="flex-row items-center bg-[#50C878] px-5 py-3 rounded-full shadow-md"
+              >
+                <Ionicons name="add" size={20} color="#fff" />
+                <Text className="text-white font-semibold ml-4 text-lg">
                   Add Product
                 </Text>
               </TouchableOpacity>

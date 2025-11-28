@@ -9,7 +9,7 @@ export const getRankedRecommendations = catchError(async (req, res, next) => {
         wilaya, 
         min_quantity, // The minimum quantity the buyer requires
         count = 10 
-    } = req.query;
+    } = req.body;
 
     if (!wilaya || !min_quantity) {
         return res.status(400).json({ success: false, message: 'Wilaya and minimum quantity are required for recommendations.' });
