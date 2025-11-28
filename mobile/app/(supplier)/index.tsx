@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
 import HomeCarousel from "@/components/FeaturedCarousel";
 import CategoryPills from "@/components/CategoryPills";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/components/Ricently";
 import FarmerCard from "@/components/FarmerCard";
 
 // Import the real data files we create below
