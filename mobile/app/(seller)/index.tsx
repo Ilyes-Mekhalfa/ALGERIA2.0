@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const ChatRoomScreen = () => {
+const index = () => {
   return (
     <View>
-      <Text>ChatRoomScreen</Text>
+      <Text>index</Text>
     </View>
   )
 }
 
-export default ChatRoomScreen
+export default index

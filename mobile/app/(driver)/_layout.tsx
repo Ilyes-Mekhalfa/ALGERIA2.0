@@ -17,20 +17,10 @@ export default function Layout() {
       }}
     >
       <Tabs.Screen
-        name="FeedScreen"
+        name="home"
         options={{
           title: "Home",
           tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
-        }}
-      />
-
-      <Tabs.Screen
-        name="MarketplaceScreen"
-        options={{
-          title: "Marketplace",
-          tabBarIcon: ({ color, size }) => (
-            <ShoppingBag color={color} size={size} />
-          ),
         }}
       />
 
