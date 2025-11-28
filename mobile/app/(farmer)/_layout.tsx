@@ -1,65 +1,38 @@
-import { Tabs } from "expo-router";
 import React from "react";
-import { Text } from "react-native";
-import {
-  Home,
-  MapPin,
-  MessageCircle,
-  Search,
-  ShoppingBag,
-  User,
-  Package,
-  Coins,
-} from "lucide-react-native";
+import { Tabs } from "expo-router";
+import CustomTabBar from "@/components/TabBar"; // Make sure this path is correct
 
-export default function FarmerLayout() {
+export default function TabLayout() {
   return (
     <Tabs
+      // 1️⃣ Hides the default standard header (since you have custom headers in screens)
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#2563eb",
-        tabBarStyle: { backgroundColor: "#fff" },
       }}
+      // 2️⃣ Overrides the default Tab Bar with your Custom Reanimated one
+      tabBar={(props) => <CustomTabBar {...props} />}
     >
+      {/* 📌 Tab 1: Dashboard (Mapped to "index" in CustomTabBar) */}
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
-          tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
+          title: "Dashboard",
         }}
       />
 
+      {/* 📌 Tab 2: Products (Mapped to "products" in CustomTabBar) */}
       <Tabs.Screen
         name="listings"
         options={{
-          title: "My Listings",
-          tabBarIcon: ({ color, size }) => (
-            <Package color={color} size={size} />
-          ),
+          title: "Products",
         }}
       />
 
-      <Tabs.Screen
-        name="chat"
-        options={{
-          title: "Chat",
-          tabBarIcon: ({ color, size }) => <MessageCircle color={color} size={size} />,
-        }}
-      />
-
+      {/* 📌 Tab 3: Analytics (Mapped to "analytics" in CustomTabBar) */}
       <Tabs.Screen
         name="market"
         options={{
           title: "Market",
-          tabBarIcon: ({ color, size }) => <Coins color={color} size={size} />,
-        }}
-      />
-
-      <Tabs.Screen
-        name="ProfileScreen"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
         }}
       />
     </Tabs>
