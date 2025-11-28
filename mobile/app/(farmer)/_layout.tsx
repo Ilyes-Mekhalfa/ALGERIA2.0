@@ -1,13 +1,18 @@
 import { Tabs } from "expo-router";
+import React from "react";
+import { Text } from "react-native";
 import {
   Home,
   MapPin,
   MessageCircle,
+  Search,
   ShoppingBag,
   User,
+  Package,
+  Coins,
 } from "lucide-react-native";
 
-export default function Layout() {
+export default function FarmerLayout() {
   return (
     <Tabs
       screenOptions={{
@@ -17,7 +22,7 @@ export default function Layout() {
       }}
     >
       <Tabs.Screen
-        name="FeedScreen"
+        name="index"
         options={{
           title: "Home",
           tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
@@ -25,22 +30,28 @@ export default function Layout() {
       />
 
       <Tabs.Screen
-        name="MarketplaceScreen"
+        name="listings"
         options={{
-          title: "Marketplace",
+          title: "My Listings",
           tabBarIcon: ({ color, size }) => (
-            <ShoppingBag color={color} size={size} />
+            <Package color={color} size={size} />
           ),
         }}
       />
 
       <Tabs.Screen
-        name="ChatListScreen"
+        name="chat"
         options={{
           title: "Chat",
-          tabBarIcon: ({ color, size }) => (
-            <MessageCircle color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size }) => <MessageCircle color={color} size={size} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="market"
+        options={{
+          title: "Market",
+          tabBarIcon: ({ color, size }) => <Coins color={color} size={size} />,
         }}
       />
 
@@ -49,14 +60,6 @@ export default function Layout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
-        }}
-      />
-
-      <Tabs.Screen
-        name="MapScreen"
-        options={{
-          title: "Map",
-          tabBarIcon: ({ color, size }) => <MapPin color={color} size={size} />,
         }}
       />
     </Tabs>
