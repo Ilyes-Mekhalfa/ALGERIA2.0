@@ -16,6 +16,7 @@ router
     .get( productController.getProduct)
     .patch( productController.updateProduct)
     .delete( productController.deleteProduct)
+router.get("/products", productController.getAllProduct);
 
 
 export default router
