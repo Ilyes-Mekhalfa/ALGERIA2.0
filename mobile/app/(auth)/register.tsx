@@ -1,7 +1,7 @@
 // In your Register.js file
 
-import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Linking } from "react-native";
 import { useAuth } from "@/providers/AuthProvider"; // <-- IMPORTANT: Import useAuth
 
 export default function Register() {
@@ -16,6 +16,7 @@ export default function Register() {
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [role, setRole] = useState("");
+  const [referralCode, setReferralCode] = useState("");
 
   const next = () => setStep(step + 1);
   const back = () => setStep(step - 1);
@@ -25,6 +26,7 @@ export default function Register() {
     try {
       // Create an object with all the user's data
       const userData = { username, email, password, confirmPassword, phone, location, role };
+      if (referralCode) userData.referralCode = referralCode;
       // Call the register function from our context
       await RegisterUser(userData);
       // Navigation will be handled by the context upon success
@@ -34,6 +36,32 @@ export default function Register() {
       Alert.alert("Registration Failed", "An error occurred. Please check your details and try again.");
     }
   };
+
+  // Listen for deep links with a referral code, e.g. myapp://register?referral=abc123
+  useEffect(() => {
+    const extractReferral = async (url) => {
+      try {
+        if (!url) return;
+        const parsed = new URL(url);
+        const ref = parsed.searchParams.get('referral') || parsed.searchParams.get('referralCode') || parsed.searchParams.get('ref');
+        if (ref) setReferralCode(ref);
+      } catch (e) {
+        // ignore malformed urls
+      }
+    };
+
+    // initial URL when app opens
+    (async () => {
+      const initialUrl = await Linking.getInitialURL();
+      await extractReferral(initialUrl);
+    })();
+
+    const onLink = ({ url }) => extractReferral(url);
+    const subscription = Linking.addEventListener('url', onLink);
+    return () => {
+      try { subscription.remove(); } catch (e) { /* RN <0.65 compat */ Linking.removeEventListener('url', onLink); }
+    };
+  }, []);
 
   return (
     <ScrollView className="flex-1 bg-white p-6">
@@ -101,6 +129,7 @@ export default function Register() {
             <Text><Text className="font-bold">Phone:</Text> {phone}</Text>
             <Text><Text className="font-bold">Location:</Text> {location}</Text>
             <Text><Text className="font-bold">Role:</Text> {role}</Text>
+              {referralCode ? <Text><Text className="font-bold">Referral:</Text> {referralCode}</Text> : null}
           </View>
           <View className="flex-row justify-between mt-4">
             <TouchableOpacity onPress={back} className="p-4">
