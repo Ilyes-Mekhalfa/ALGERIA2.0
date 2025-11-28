@@ -17,6 +17,7 @@ import errorhandler from './controllers/error.controllers.js'
 
 //importing routes
 import authRouter from './routes/auth.routes.js'
+import productRoutes from './routes/product.routes.js'
 
 //create express app
 const app = express();
@@ -103,6 +104,7 @@ app.use(hpp());
 
 // Routes
 app.use('/', authRouter)
+app.use('/products' , productRoutes)
 
 // Handle non-existing routes
 app.all(/.*/, (req, res, next) => {

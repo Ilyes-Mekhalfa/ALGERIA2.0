@@ -1,35 +1,31 @@
-import jwt from'jsonwebtoken';
-import logger from'../utils/logger';
+import jwt from 'jsonwebtoken';
+import logger from '../utils/logger.js';
+import { isBlacklisted } from '../utils/tokenBlacklist.js';
 
-const JWT_SECRET = process.env.JWT_SECRET ;
 const authenticate = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
 
     if (!token) {
-      return res.status(401).json({
-        error: 'Authentication required',
-        message: 'No token provided'
-      });
+      return res.status(401).json({ error: 'Authentication required', message: 'No token provided' });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
+    if (isBlacklisted(token)) {
+      return res.status(401).json({ error: 'Token revoked', message: 'Please login again' });
+    }
+
+    const secret = process.env.JWT_SECRET || 'default-secret-key-change-in-production';
+    const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
   } catch (error) {
     logger.error('Authentication error:', error);
-    
+
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({
-        error: 'Token expired',
-        message: 'Please login again'
-      });
+      return res.status(401).json({ error: 'Token expired', message: 'Please login again' });
     }
-    
-    return res.status(401).json({
-      error: 'Invalid token',
-      message: 'Authentication failed'
-    });
+
+    return res.status(401).json({ error: 'Invalid token', message: 'Authentication failed' });
   }
 };
 
