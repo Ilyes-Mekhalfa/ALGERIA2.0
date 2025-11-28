@@ -9,10 +9,10 @@ import { sendEmail } from '../utils/email.js';
 export const register = catchError(async (req, res, next) => {
 
     //get the userdata from the frontend
-    const {name, email, password, confirmPassword, role} = req.body;
+    const {username, email, password, confirmPassword, role} = req.body;
 
     // Validate user data
-    const validationErrors = validateUserData({ name, email, password, confirmPassword, role });
+    const validationErrors = validateUserData({ username, email, password, confirmPassword, role });
     if (hasValidationErrors(validationErrors)) {
       return res.status(400).json({
         success: false,

@@ -1,10 +1,6 @@
 import { catchError } from '../utils/catchError.js';
 import RecombeeService from '../services/recombee.service.js';
 
-/**
- * Get personalized product recommendations for a user filtered by wilaya
- * GET /recommendations/user/:userId?wilaya=Algiers&count=5
- */
 export const getRecommendationsForUser = catchError(async (req, res, next) => {
   const { userId } = req.params;
   const { wilaya, count = 5, diversity = 0.5 } = req.query;

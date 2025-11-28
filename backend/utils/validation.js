@@ -196,8 +196,8 @@ export const validateProductData = (data) => {
 export const validateUserData = (data) => {
   const errors = {};
 
-  if (!data.name || typeof data.name !== 'string' || data.name.trim().length < 2) {
-    errors.name = 'Name is required and must be at least 2 characters long';
+  if (!data.username || typeof data.username !== 'string' || data.username.trim().length < 2) {
+    errors.username = 'Username is required and must be at least 2 characters long';
   }
 
   if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
