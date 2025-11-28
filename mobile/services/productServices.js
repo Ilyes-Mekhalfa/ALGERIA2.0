@@ -29,16 +29,25 @@ const productService = {
    * @param {object} [params] - Optional query parameters.
    * @returns {Promise<Array>} A promise that resolves to an array of the user's products.
    */
-  async getMyProducts(params = {}) {
+ async getMyProducts(userId) {
+    // --- Guard Clause: Don't make a call without an ID ---
+    if (!userId) {
+      console.error("getMyProducts called without a userId.");
+      return []; // Return an empty array to prevent crashes
+    }
+
     try {
-      // This endpoint is protected and uses the user's token to find their products.
-      const res = await api.get('/products/my-products', { params }); 
-      return res.data.data || res.data;
+      // --- Build the URL with the ID in the path ---
+      const res = await api.get(`/products/my-products/${userId}`); 
+      // ------------------------------------------
+        // console.log(res.data.products)
+      return res.data.products
     } catch (error) {
       console.error("Error fetching 'My Products':", error);
       throw error;
     }
   },
+
 
   /**
    * Fetches a single product by its ID.

@@ -4,20 +4,17 @@ import {
   FlatList,
   StatusBar,
   TouchableOpacity,
-  ActivityIndicator, // Import for loading spinner
+  ActivityIndicator,
 } from "react-native";
-import React, { useState, useEffect } from "react"; // Import useEffect
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router"; // Import for navigation
+import { useRouter } from "expo-router";
 
-// --- 1. IMPORT YOUR SERVICE, NOT STATIC DATA ---
 import productService from "../../services/productServices"; // Adjust this path
-// import productData from "@/lib/products"; // Remove this
-// ---------------------------------------------
-
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@/providers/AuthProvider"; // Import your useAuth hook
 
 const filterTabs = ["Active", "Draft", "Completed"];
 
@@ -25,53 +22,65 @@ const Listings = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("Active");
 
-  // --- 2. ADD STATE FOR PRODUCTS, LOADING, AND ERRORS ---
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // ----------------------------------------------------
 
-  // --- 3. FETCH DATA FROM THE API ---
+  // --- 1. GET THE USER OBJECT FROM THE AUTH CONTEXT ---
+  const { user } = useAuth();
+  // ---------------------------------------------------
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  if (!user) {
+    setLoading(false);
+    setProducts([]);
+    return;
+  }
 
-        // Use the service to get all products
-        const response = await productService.getAllProducts();
+  const fetchMyProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log("FRONTEND: Requesting products for user ID:", user.id);
 
-        // --- THIS IS THE FIX ---
-        // The response IS the array of products. Set it directly.
-        setProducts(response || []);
-        // -----------------------
-      } catch (err) {
-        console.error("Failed to fetch listings:", err);
-        setError("Could not load products. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
+      // --- THIS IS THE FIX ---
+      // Pass the user.id directly as an argument to the service function.
+      const response = await productService.getMyProducts(user.id);
+      // -----------------------
+      
+      setProducts(response || []);
+    } catch (err) {
+      console.error("Failed to fetch 'My Listings':", err);
+      setError("Could not load your products.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchProducts();
-  }, []);
-
-  // --- 4. RENDER LOADING OR ERROR STATES ---
+  fetchMyProducts();
+}, [user]);
   const renderContent = () => {
     if (loading) {
       return (
         <ActivityIndicator size="large" color="#50C878" className="mt-16" />
       );
     }
-
     if (error) {
       return <Text className="text-center text-red-500 mt-16">{error}</Text>;
     }
-
+    // Add a specific message if the user is not logged in
+    if (!user) {
+      return (
+        <Text className="text-center text-gray-500 mt-16">
+          Please log in to see your products.
+        </Text>
+      );
+    }
     return (
       <FlatList
-        data={products} // Use state variable here
-        keyExtractor={(item) => item._id} // Use MongoDB's _id
+        data={products}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <View className="flex-1 mb-4">
             <ProductCard item={item} />
@@ -83,25 +92,23 @@ const Listings = () => {
         columnWrapperStyle={{ gap: 16 }}
         ListEmptyComponent={
           <Text className="text-center text-gray-500 mt-16">
-            No products found.
+            You haven't listed any products yet.
           </Text>
         }
       />
     );
   };
-  // ---------------------------------------
 
   return (
     <SafeAreaView className="flex-1 bg-[#F4FDF6]">
       <StatusBar barStyle="dark-content" />
 
-      {/* --- RENDER HEADER AND TABS STATICALLY --- */}
       <Header />
       <View className="flex-row justify-evenly items-center mt-6 mb-8 px-5">
-        <Text className="text-3xl font-extrabold">Products</Text>
+        <Text className="text-3xl font-extrabold">My Listings</Text>
         <TouchableOpacity
           className="flex-row items-center bg-[#50C878] px-5 py-3 rounded-full shadow-md"
-          onPress={() => router.push("/new")} // <-- 5. Link to Add Product page
+          onPress={() => router.push("/new")}
         >
           <Ionicons name="add" size={22} color="#fff" />
           <Text className="text-white font-semibold ml-1 text-lg">
@@ -109,6 +116,7 @@ const Listings = () => {
           </Text>
         </TouchableOpacity>
       </View>
+
       <View className="flex-row justify-between px-5 mb-4">
         {filterTabs.map((tab) => {
           const isActive = activeTab === tab;
@@ -116,11 +124,7 @@ const Listings = () => {
             <TouchableOpacity
               key={tab}
               onPress={() => setActiveTab(tab)}
-              className={`px-8 py-3 rounded-full ${
-                isActive
-                  ? "bg-[#FCD27B]"
-                  : "border-2 border-[#FCD27B] bg-[#FFFDF5]"
-              }`}
+              className={`px-8 py-3 rounded-full ${isActive ? "bg-[#FCD27B]" : "border-2 border-[#FCD27B] bg-[#FFFDF5]"}`}
             >
               <Text
                 className={`font-bold ${isActive ? "text-white" : "text-[#FCD27B]"}`}
@@ -132,7 +136,6 @@ const Listings = () => {
         })}
       </View>
 
-      {/* --- RENDER THE DYNAMIC CONTENT --- */}
       {renderContent()}
     </SafeAreaView>
   );
