@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { SafeAreaView, View, Text, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { Plus, Star, BarChart2 } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 
 // --- Reusable Product Card Component ---
 
@@ -49,6 +51,7 @@ const ProductCard = ({ name, quantity, status, offers, views, date }) => {
 
 const ProductsScreen = () => {
   const [activeTab, setActiveTab] = useState('Active');
+  const router = useRouter();
 
   // Mock data for the lists
   const mockData = {
@@ -77,7 +80,7 @@ const ProductsScreen = () => {
       {/* --- Header --- */}
       <View className="flex-row justify-between items-center p-6 border-b border-gray-200 bg-white">
         <Text className="text-3xl font-bold text-gray-800">My Products</Text>
-        <TouchableOpacity className="bg-green-700 p-3 rounded-full shadow-lg shadow-green-900/30">
+        <TouchableOpacity onPress={() => router.replace('/new')} className="bg-green-700 p-3 rounded-full shadow-lg shadow-green-900/30">
           <Plus color="#fff" size={24} strokeWidth={3} />
         </TouchableOpacity>
       </View>
