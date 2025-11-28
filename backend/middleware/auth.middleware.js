@@ -4,7 +4,15 @@ import { isBlacklisted } from '../utils/tokenBlacklist.js';
 
 const authenticate = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    // Accept token from Authorization header, cookie, or query param for flexibility
+    let token = null;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    } else if (req.query && req.query.token) {
+      token = req.query.token;
+    }
 
     if (!token) {
       return res.status(401).json({ error: 'Authentication required', message: 'No token provided' });

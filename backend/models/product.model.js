@@ -16,6 +16,19 @@ const ProductSchema = new mongoose.Schema({
     stock : {
         type :Number,
         required : [true, 'product must have stock quantity']
+    },
+    userId : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'user',
+        required : [true , 'product must belong to a user']
+    },
+    category : {
+        type : String,
+        enum : ['fruits' , 'vegetables','milk products']
+    },
+    createdAt : {
+        type : Date,
+        default : Date.now()
     }
 })
 
