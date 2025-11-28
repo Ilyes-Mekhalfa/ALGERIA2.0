@@ -32,6 +32,10 @@ class ProductService {
 		const deleted = await Product.findByIdAndDelete(id);
 		return deleted;
 	}
+
+    async findMany(filter) {
+        return await Product.find(filter)
+    }
 }
 
 export default new ProductService();

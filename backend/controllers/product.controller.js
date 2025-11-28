@@ -42,7 +42,16 @@
         data: product    
     })
  })
+export const getMyProducts = catchError(async (req , res , next)=>{
+    //get the user
+    const userId = req.body.userId;
 
+    const products = await ProductService.findMany({userId})
+
+    return res.status(200).json({
+        products
+    })
+})
  export const getAllProduct = catchError (async (req , res ,next)=>{
     const { page = 1, limit = 20 } = req.query;
     const result = await ProductService.getAllProducts({ page, limit })

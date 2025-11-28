@@ -5,10 +5,11 @@ const require = createRequire(import.meta.url);
 // ✅ Import the entire module as default
 const recombee = require('recombee-api-client');
 
-// ✅ Create the client - RecombeeClient might be on the default export
+console.log(process.env.RECOMBEE_DB_ID);
+
 export const client = new recombee.ApiClient(
-  'mj-recommender-minitere-recommender',
-  'dh4gszjnkQPEd2Ax0rd91U6e7gitT5B19UwHOVFqmYGACIjYPXKwtwl2pKD7vNJg',
+   'esi-sba-algeria2-0' ,
+   'wcizltveBh5y1eTZpX1HW1xhrs1Jy34RRAFKe1HovjWuuyPyRfwa7ct84VqTt1vv' ,
   { region: 'eu-west' }
 );
 
