@@ -6,7 +6,7 @@
     const productData = req.body;
 
     //sanitize product data
-    const product = await ProductDataService.create(productData)
+    const product = await ProductService.create(productData)
 
     res.status(201).json({
         success: true
@@ -16,7 +16,7 @@
 
  export const getProduct = catchError(async (req , res ,next)=>{
 
-    const product = await ProductService.getProductById(req.body.id)
+    const product = await ProductService.getProductById(req.params.id)
 
     res.status(200).json({
         success : true,
@@ -34,18 +34,19 @@
  })
 
  export const updateProduct = catchError(async (req , res , next)=>{
-    const  productId = req.body.id;
-    const updatedData = req.body.updatedData
+    const  productId = req.params.id;
+    const updatedData = req.body
 
     const updatedProduct = await ProductService.updateProduct(productId , updatedData)
 
-    res.status(204).json({
-        success : true
+    res.status(200).json({
+        success : true,
+        updatedProduct
     })
  })
 
  export const deleteProduct = catchError(async (req , res ,next)=>{
-    const productId = req.body.id
+    const productId = req.params.id
 
     await ProductService.deleteProduct(productId)
 

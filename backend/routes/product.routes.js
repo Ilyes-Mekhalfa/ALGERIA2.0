@@ -6,13 +6,13 @@ const router = express.Router()
 router
      .route('/')
      .get(productController.getAllProduct)
-     .post(authenticate ,productController.createProduct)
+     .post(productController.createProduct)
 
 router
     .route('/:id')
-    .get(authenticate, productController.getProduct)
-    .patch(authenticate, productController.updateProduct)
-    .delete(authenticate, productController.deleteProduct)
+    .get( productController.getProduct)
+    .patch( productController.updateProduct)
+    .delete( productController.deleteProduct)
 
 
 export default router
