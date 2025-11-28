@@ -37,15 +37,14 @@ const Listings = () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Use the service to get all products
         const response = await productService.getAllProducts();
-        
+
         // --- THIS IS THE FIX ---
         // The response IS the array of products. Set it directly.
-        setProducts(response || []); 
+        setProducts(response || []);
         // -----------------------
-
       } catch (err) {
         console.error("Failed to fetch listings:", err);
         setError("Could not load products. Please try again later.");
@@ -60,7 +59,9 @@ const Listings = () => {
   // --- 4. RENDER LOADING OR ERROR STATES ---
   const renderContent = () => {
     if (loading) {
-      return <ActivityIndicator size="large" color="#50C878" className="mt-16" />;
+      return (
+        <ActivityIndicator size="large" color="#50C878" className="mt-16" />
+      );
     }
 
     if (error) {
@@ -81,7 +82,9 @@ const Listings = () => {
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}
         columnWrapperStyle={{ gap: 16 }}
         ListEmptyComponent={
-            <Text className="text-center text-gray-500 mt-16">No products found.</Text>
+          <Text className="text-center text-gray-500 mt-16">
+            No products found.
+          </Text>
         }
       />
     );
@@ -91,14 +94,14 @@ const Listings = () => {
   return (
     <SafeAreaView className="flex-1 bg-[#F4FDF6]">
       <StatusBar barStyle="dark-content" />
-      
+
       {/* --- RENDER HEADER AND TABS STATICALLY --- */}
       <Header />
       <View className="flex-row justify-evenly items-center mt-6 mb-8 px-5">
         <Text className="text-3xl font-extrabold">Products</Text>
-        <TouchableOpacity 
-            className="flex-row items-center bg-[#50C878] px-5 py-3 rounded-full shadow-md"
-            onPress={() => router.push('/new')} // <-- 5. Link to Add Product page
+        <TouchableOpacity
+          className="flex-row items-center bg-[#50C878] px-5 py-3 rounded-full shadow-md"
+          onPress={() => router.push("/new")} // <-- 5. Link to Add Product page
         >
           <Ionicons name="add" size={22} color="#fff" />
           <Text className="text-white font-semibold ml-1 text-lg">
@@ -119,17 +122,18 @@ const Listings = () => {
                   : "border-2 border-[#FCD27B] bg-[#FFFDF5]"
               }`}
             >
-              <Text className={`font-bold ${isActive ? "text-white" : "text-[#FCD27B]"}`}>
+              <Text
+                className={`font-bold ${isActive ? "text-white" : "text-[#FCD27B]"}`}
+              >
                 {tab}
               </Text>
             </TouchableOpacity>
           );
         })}
       </View>
-      
+
       {/* --- RENDER THE DYNAMIC CONTENT --- */}
       {renderContent()}
-
     </SafeAreaView>
   );
 };

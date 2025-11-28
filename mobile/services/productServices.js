@@ -1,35 +1,48 @@
-import api from '../utils/axios'; // Adjust this path to where your axios.js file is located
+import api from '../utils/axios'; // Adjust this path if necessary
 
 /**
- * A service object for handling all product-related API requests.
+ * A service for handling all product-related API requests.
  */
 const productService = {
+
   /**
-   * Fetches a paginated and filtered list of products from the backend.
-   * @param {object} params - The query parameters.
-   * @param {object} [params.filter] - MongoDB filter object.
-   * @param {number} [params.page=1] - The page number to fetch.
-   * @param {number} [params.limit=20] - The number of items per page.
-   * @param {object} [params.sort] - MongoDB sort object (e.g., { createdAt: -1 }).
-   * @returns {Promise<object>} A promise that resolves to the API response data (e.g., { items, total, page, limit }).
+   * Fetches all products from the market for any user.
+   * Assumes the backend endpoint is GET /products
+   * @param {object} [params] - Optional query parameters like page, limit, etc.
+   * @returns {Promise<Array>} A promise that resolves to an array of all product objects.
    */
   async getAllProducts(params = {}) {
     try {
-      // Axios automatically converts the 'params' object into URL query parameters
-      // e.g., /products?page=1&limit=10
       const res = await api.get('/products', { params });
-      console.log(res.data.data);
-      return res.data.data;
-
+      // Assuming the backend returns the array of products directly or within a data object
+      return res.data.data || res.data; 
     } catch (error) {
-      console.error("Error fetching products:", error);
-      throw error; // Re-throw the error so the UI component can handle it
+      console.error("Error fetching all products:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * --- NEW FUNCTION ---
+   * Fetches only the products belonging to the currently authenticated user.
+   * Assumes a new backend endpoint like GET /products/my-products
+   * @param {object} [params] - Optional query parameters.
+   * @returns {Promise<Array>} A promise that resolves to an array of the user's products.
+   */
+  async getMyProducts(params = {}) {
+    try {
+      // This endpoint is protected and uses the user's token to find their products.
+      const res = await api.get('/products/my-products', { params }); 
+      return res.data.data || res.data;
+    } catch (error) {
+      console.error("Error fetching 'My Products':", error);
+      throw error;
     }
   },
 
   /**
    * Fetches a single product by its ID.
-   * @param {string} productId - The ID of the product to fetch.
+   * @param {string} productId - The ID of the product.
    * @returns {Promise<object>} A promise that resolves to the product object.
    */
   async getProductById(productId) {
@@ -44,11 +57,10 @@ const productService = {
   },
 
   /**
-   * Creates a new product.
-   * Note: For file uploads (images), this needs to be handled differently using FormData.
-   * This example assumes 'productData' is a JSON object.
-   * @param {object} productData - The data for the new product.
-   * @returns {Promise<object>} A promise that resolves to the newly created product object.
+   * Creates a new product. The backend will associate it with the logged-in user.
+   * The productData can now include 'unit' and 'quality'.
+   * @param {object} productData - Data for the new product (e.g., { name, price, stock, unit, quality }).
+   * @returns {Promise<object>} A promise that resolves to the newly created product.
    */
   async createProduct(productData) {
     try {
@@ -63,13 +75,12 @@ const productService = {
   /**
    * Updates an existing product by its ID.
    * @param {string} productId - The ID of the product to update.
-   * @param {object} updateData - An object containing the fields to update.
-   * @returns {Promise<object>} A promise that resolves to the updated product object.
+   * @param {object} updateData - Fields to update.
+   * @returns {Promise<object>} A promise that resolves to the updated product.
    */
   async updateProduct(productId, updateData) {
     if (!productId) throw new Error("Product ID is required for updating.");
     try {
-      // Use PUT for full updates or PATCH for partial updates, depending on your API
       const res = await api.put(`/products/${productId}`, updateData);
       return res.data;
     } catch (error) {
@@ -81,7 +92,7 @@ const productService = {
   /**
    * Deletes a product by its ID.
    * @param {string} productId - The ID of the product to delete.
-   * @returns {Promise<object>} A promise that resolves to the response data from the server (e.g., the deleted object or a success message).
+   * @returns {Promise<object>} A promise that resolves to the server's response.
    */
   async deleteProduct(productId) {
     if (!productId) throw new Error("Product ID is required for deletion.");
