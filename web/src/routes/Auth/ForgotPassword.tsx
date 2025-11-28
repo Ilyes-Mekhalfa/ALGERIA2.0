@@ -113,7 +113,7 @@ export default function ForgotPasswordPage() {
       // Simulated - remove in production
       setSuccess("Password reset successfully! Redirecting to sign in...");
       setTimeout(() => {
-        navigate("/auth/signin");
+        navigate("/signin");
       }, 2000);
     } catch (err) {
       setError("An error occurred while resetting your password.");
@@ -303,7 +303,7 @@ export default function ForgotPasswordPage() {
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
             Remember your password?{" "}
-            <a href="/auth/signin" className="text-primary font-semibold hover:underline">
+            <a href="/signin" className="text-primary font-semibold hover:underline">
               Sign In
             </a>
           </p>

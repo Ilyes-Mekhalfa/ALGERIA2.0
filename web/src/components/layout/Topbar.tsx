@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
+import useAuthStore from "../../store/authStore";
 import notification from "../../assets/notification.svg";
 
 interface NotificationItem {
@@ -41,6 +43,8 @@ export default function Topbar() {
   ]);
 
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
+  const logoutStore = useAuthStore((s) => s.logout);
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAsRead = (id: string) => {
@@ -70,17 +74,19 @@ export default function Topbar() {
   };
 
   return (
-    <header className="w-full border-b bg-white px-6 py-3 flex items-center justify-between shadow-sm relative">
+    <header className="w-full bg-none px-6 py-3 flex items-center justify-between relative">
       <h2 className="text-xl font-semibold">AgroConnect Admin</h2>
 
       <div className="flex items-center gap-4">
+        {user && (
+          <div className="text-sm text-gray-700 mr-4">Hello, {user.name || user.fullName || user.email}</div>
+        )}
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
             className="text-sm text-muted-foreground hover:text-primary flex items-center gap-2 relative"
           >
             <img src={notification} alt="Notifications" />
-            Notifications
             {unreadCount > 0 && (
               <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-600 rounded-full">
                 {unreadCount}
@@ -172,6 +178,24 @@ export default function Topbar() {
                   >
                     View all notifications
                   </button>
+
+          {/* Simple logout button */}
+          <button
+            onClick={async () => {
+              try {
+                await api.logout();
+              } catch (e) {
+                // ignore network errors - still clear local state
+                // eslint-disable-next-line no-console
+                console.error("logout error", e);
+              }
+              logoutStore();
+              navigate("/signin");
+            }}
+            className="ml-4 text-sm text-red-600 hover:underline"
+          >
+            Logout
+          </button>
                 </div>
               )}
             </div>

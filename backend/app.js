@@ -112,6 +112,7 @@ app.use(hpp());
 // Routes
 app.use('/', authRouter)
 app.use('/products' , productRoutes)
+app.use("/api", productRoutes)
 app.use('/recommendations', recommendationRoutes)
 
 // Handle non-existing routes
