@@ -3,11 +3,11 @@ import RecommendationService from '../services/recommendationService.js'
 
 
 export const getRankedRecommendations = catchError(async (req, res, next) => {
-    // Collect user/query parameters
+    // Collect user/query parameters    
     const { 
         userId, 
         wilaya, 
-        min_quantity, // The minimum quantity the buyer requires
+        min_quantity, 
         count = 10 
     } = req.body;
 
