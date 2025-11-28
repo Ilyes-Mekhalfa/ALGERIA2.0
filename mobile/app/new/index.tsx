@@ -145,7 +145,7 @@ const AddProductScreen = () => {
 
       {/* Footer with Action Buttons (No changes) */}
       <View className="flex-row justify-between p-4 bg-white border-t border-gray-200">
-        <TouchableOpacity onPress={() => router.back()} className="w-[48%] bg-gray-200 py-4 rounded-2xl items-center">
+        <TouchableOpacity onPress={() => router.replace('/(farmer)')} className="w-[48%] bg-gray-200 py-4 rounded-2xl items-center">
           <Text className="text-base font-bold text-gray-800">Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity 
