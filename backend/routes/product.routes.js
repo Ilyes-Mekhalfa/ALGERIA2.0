@@ -5,7 +5,7 @@ const router = express.Router()
 
 router
      .route('/')
-     .get(productController.getAllProducts)
+     .get(productController.getAllProduct)
      .post(authenticate ,productController.createProduct)
 
 router
