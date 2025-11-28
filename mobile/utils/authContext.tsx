@@ -1,58 +1,113 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
-import api from "./axios";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
+import api from "./axios"; // Make sure this path is correct
 
-const AuthContext = createContext(null);
+// TypeScript: Define the shape of your context data for better type safety
+type AuthContextType = {
+  user: object | null;
+  loading: boolean;
+  login: (email, password) => Promise<void>;
+  register: (userData) => Promise<void>;
+  logout: () => Promise<void>;
+};
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+// Initialize context with a default value
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState<object | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  // Load user on app start
+  // On app start, load the user from storage
   useEffect(() => {
-    const loadUser = async () => {
+    const loadUserFromStorage = async () => {
       const token = await SecureStore.getItemAsync("token");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const res = await api.get("/auth/me");
-        setUser(res.data);
-      } catch (err) {
-        await SecureStore.deleteItemAsync("token");
+      const userString = await SecureStore.getItemAsync("user");
+
+      if (token && userString) {
+        // If we have token and user data, we are likely logged in
+        setUser(JSON.parse(userString));
       }
       setLoading(false);
     };
-    loadUser();
+    
+    loadUserFromStorage();
   }, []);
 
+  // --- LOGIN FUNCTION ---
   const login = async (email, password) => {
-    const res = await api.post("/auth/login", { email, password });
-    await SecureStore.setItemAsync("token", res.data.token);
-    setUser(res.data.user);
-    router.replace("/(tabs)");
+    const res = await api.post("/login", { email, password });
+
+    const token = res.data.token;
+    const user = res.data.user;
+
+    // Defensive check
+    if (token ) {
+      await SecureStore.setItemAsync("token", token);
+      await SecureStore.setItemAsync("user", JSON.stringify(user));
+      setUser(user);
+      router.replace("/(farmer)"); // Or your main app route
+    } else {
+      throw new Error("Login failed: Invalid response from server.");
+    }
   };
 
-  const register = async (email, password, name) => {
-    const res = await api.post("/auth/register", { email, password, name });
-    await SecureStore.setItemAsync("token", res.data.token);
-    setUser(res.data.user);
-    router.replace("/(tabs)");
-  };
+  // --- REGISTER FUNCTION ---
+  const register = async (userData) => {
+    const apiPayload = {
+      username: userData.username,
+      email: userData.email,
+      password: userData.password,
+      confirmPassword: userData.confirmPassword,
+      role: userData.role,
+    };
+    
+    const res = await api.post("/register", apiPayload);
 
+    // After a successful API call, get the token and user
+    const token = res.data.token;
+    console.log(token);
+    const user = res.data.user;
+
+    // Defensive Check: Ensure the token exists and is a string before saving
+    if (token && typeof token === 'string' && user) {
+      await SecureStore.setItemAsync("token", token);
+      // Stringify the user object before saving
+      await SecureStore.setItemAsync("user", JSON.stringify(user));
+
+      setUser(user);
+      router.replace("/(farmer)"); // Or your main app route
+    } else {
+      // This will be thrown if the backend response is not what we expect
+      throw new Error("Registration succeeded but the server response was invalid.");
+    }
+  };
+  
+  // --- LOGOUT FUNCTION ---
   const logout = async () => {
+    // Remove all session data from storage
     await SecureStore.deleteItemAsync("token");
+    await SecureStore.deleteItemAsync("user");
+
     setUser(null);
     router.replace("/(auth)/login");
   };
 
+  // Provide all functions and state to children
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => useContext(AuthContext);
+// --- Custom Hook to use the Auth Context ---
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}
