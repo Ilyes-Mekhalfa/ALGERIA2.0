@@ -120,7 +120,7 @@ const BuyProductScreen = () => {
           "Success!", 
           "Your order has been placed successfully.",
           // Navigate to the user's orders page on success
-          [{ text: "View My Orders", onPress: () => router.push('/(farmer)/orders') }] 
+          [{ text: "View My Orders", onPress: () => router.push('/(supplier)/orders') }] 
         );
       } catch (error) {
         console.error("Failed to create order:", error);
