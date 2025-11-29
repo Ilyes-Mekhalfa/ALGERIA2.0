@@ -32,13 +32,16 @@ const orderService = {
    * @param {object} [params] - Optional query parameters (e.g., { status: 'pending' }).
    * @returns {Promise<Array>} A promise that resolves to an array of the user's orders.
    */
- async getMyOrders(params = {}) { // The userId argument is removed
-    try {
-      // The call is now to the simpler, more secure URL.
-      const res = await api.get('/my-orders', { params }); 
-      return res.data.data || res.data;
+ async getMyOrders(userId) { // The userId argument is removed
+     try {
+      // --- Build the URL with the ID in the path ---
+      const res = await api.get(`/orders/my-orders/${userId}`); 
+      // ------------------------------------------
+        // console.log(res.data.products)
+        console.log(res.data)
+      return res.data
     } catch (error) {
-      console.error("Error fetching 'My Orders':", error);
+      console.error("Error fetching 'My Products':", error);
       throw error;
     }
   },

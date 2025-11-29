@@ -7,10 +7,10 @@ const router = express.Router()
 router
     .route('/')
     .post(authenticate , orderController.createOrder)
-    .get(authenticate , authorize('admin') , orderController.getAllOrders)
+    .get(authenticate  , orderController.getAllOrders)
 
 router
-    .route('/my-orders') // The :id is removed
+    .route('/my-orders/:id') // The :id is removed
     .get(authenticate, orderController.getMyOrders)
 
 router

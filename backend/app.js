@@ -21,6 +21,7 @@ import productRoutes from './routes/product.routes.js'
 import recommendationRoutes from './routes/recommendation.routes.js'
 import orderRoutes from './routes/order.routes.js'
 
+
 //create express app
 const app = express();
 
@@ -113,7 +114,6 @@ app.use(hpp());
 // Routes
 app.use('/', authRouter)
 app.use('/products' , productRoutes)
-app.use("/api", productRoutes)
 app.use('/recommendations', recommendationRoutes)
 app.use('/orders', orderRoutes)
 
