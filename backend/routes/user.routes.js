@@ -15,5 +15,8 @@ router
     .route('/delete-account')
     .delete(authenticate , authorize('admin') , userController.deleteUser)
 
+router
+     .route('/allUsers')
+     .get(authenticate , authorize('admin') , userController.getAllUsers)
 
 export default router

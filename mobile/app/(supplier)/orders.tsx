@@ -13,7 +13,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/providers/AuthProvider";
 import orderService from "../../services/orderServices"; // Adjust this path if needed
 
-const FALLBACK_IMAGE_URL = "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500";
+const FALLBACK_IMAGE_URL =
+  "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500";
 
 // --- Reusable Order Card Component ---
 const OrderCard = ({ item }) => {
@@ -38,7 +39,8 @@ const OrderCard = ({ item }) => {
   const imageUrl = firstProduct.imageUrl || FALLBACK_IMAGE_URL;
 
   // Calculate the total value of the order
-  const totalValue = item.products?.reduce((sum, p) => sum + (p.price * p.quantity), 0) || 0;
+  const totalValue =
+    item.products?.reduce((sum, p) => sum + p.price * p.quantity, 0) || 0;
 
   return (
     <View className="bg-white rounded-2xl p-3 mb-4 shadow-sm mx-4">
@@ -51,18 +53,22 @@ const OrderCard = ({ item }) => {
         <View className="flex-1 ml-3 justify-between">
           <View>
             <Text className="text-gray-500 font-bold text-xs mb-1">
-              {totalValue.toLocaleString('en-US')} DZD
+              {totalValue.toLocaleString("en-US")} DZD
             </Text>
-            <Text className="text-black font-bold text-base leading-5 mb-1" numberOfLines={2}>
+            <Text
+              className="text-black font-bold text-base leading-5 mb-1"
+              numberOfLines={2}
+            >
               {firstProduct.name || `Order #${item._id.slice(-6)}`}
             </Text>
             <Text className="text-gray-400 text-xs">
               {/* This assumes your .populate() adds the username */}
-              Seller: {item.seller?.username || 'N/A'}
+              Seller: {item.seller?.username || "N/A"}
             </Text>
           </View>
           <Text className="text-gray-400 text-xs text-right self-end">
-            {item.products?.length || 0} {item.products?.length === 1 ? 'item' : 'items'}
+            {item.products?.length || 0}{" "}
+            {item.products?.length === 1 ? "item" : "items"}
           </Text>
         </View>
       </View>
@@ -72,7 +78,9 @@ const OrderCard = ({ item }) => {
           {new Date(item.createdAt).toLocaleDateString()}
         </Text>
         <View className={`px-3 py-1 rounded-full ${statusStyle.split(" ")[0]}`}>
-          <Text className={`text-xs font-bold capitalize ${statusStyle.split(" ")[1]}`}>
+          <Text
+            className={`text-xs font-bold capitalize ${statusStyle.split(" ")[1]}`}
+          >
             {item.status}
           </Text>
         </View>
@@ -104,13 +112,14 @@ const OrdersScreen = () => {
       try {
         // Define params based on the active tab
         const params = {
-          status: activeTab === "New" ? "pending,shipped" : "delivered,cancelled",
+          status:
+            activeTab === "New" ? "pending,shipped" : "delivered,cancelled",
         };
-        
+
         // Correctly call the service with userId and params
-        const response = await orderService.getMyOrders(params);
-        
-        setOrders(response || []);
+        const response = await orderService.getMyOrders(user.id);
+
+        setOrders(response.data || []);
       } catch (err) {
         console.error("Failed to fetch orders:", err);
         setError("Could not load your orders.");
@@ -124,13 +133,19 @@ const OrdersScreen = () => {
 
   const renderContent = () => {
     if (loading) {
-      return <ActivityIndicator size="large" color="#22c55e" className="mt-10" />;
+      return (
+        <ActivityIndicator size="large" color="#22c55e" className="mt-10" />
+      );
     }
     if (error) {
       return <Text className="text-center text-red-500 mt-10">{error}</Text>;
     }
     if (!user) {
-        return <Text className="text-center text-gray-500 mt-10">Please log in to view your orders.</Text>;
+      return (
+        <Text className="text-center text-gray-500 mt-10">
+          Please log in to view your orders.
+        </Text>
+      );
     }
     return (
       <FlatList
@@ -150,7 +165,11 @@ const OrdersScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-[#F6F8FA]">
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor="transparent"
+        translucent
+      />
       <ImageBackground
         source={require("@/assets/images/Frame3384411.png")} // Make sure this path is correct
         className="w-full pt-16 pb-4"
@@ -163,7 +182,9 @@ const OrdersScreen = () => {
               onPress={() => setActiveTab("New")}
               className={`pb-2 ${activeTab === "New" ? "border-b-2 border-green-500" : "border-b-2 border-transparent"}`}
             >
-              <Text className={`text-base font-bold ${activeTab === "New" ? "text-green-600" : "text-gray-400"}`}>
+              <Text
+                className={`text-base font-bold ${activeTab === "New" ? "text-green-600" : "text-gray-400"}`}
+              >
                 New orders
               </Text>
             </TouchableOpacity>
@@ -171,14 +192,16 @@ const OrdersScreen = () => {
               onPress={() => setActiveTab("Past")}
               className={`pb-2 ${activeTab === "Past" ? "border-b-2 border-green-500" : "border-b-2 border-transparent"}`}
             >
-              <Text className={`text-base font-bold ${activeTab === "Past" ? "text-green-600" : "text-gray-400"}`}>
+              <Text
+                className={`text-base font-bold ${activeTab === "Past" ? "text-green-600" : "text-gray-400"}`}
+              >
                 Past Orders
               </Text>
             </TouchableOpacity>
           </View>
         </View>
       </ImageBackground>
-      
+
       {renderContent()}
     </SafeAreaView>
   );

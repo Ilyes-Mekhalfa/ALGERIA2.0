@@ -1,4 +1,5 @@
 import Order from '../models/order.model.js';
+import User from '../models/user.model.js';
 
 class OrderService {
     async create(data){
@@ -42,8 +43,7 @@ class OrderService {
     const orders = await Order.find({
       $or: [{ buyer: userId }, { seller: userId }]
     })
-    .populate('buyer', 'username') // Optional: Replaces buyer ID with their username
-    .populate('seller', 'username'); // Optional: Replaces seller ID with their username
+
 
     return orders;
   }
