@@ -1,15 +1,32 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { ChevronDown, UploadCloud, ArrowLeft } from 'lucide-react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { ChevronDown, UploadCloud, ArrowLeft } from "lucide-react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 
-import productService from '../../services/productServices'; // Adjust the import path
-import { useAuth } from '@/providers/AuthProvider';
+import productService from "../../services/productServices"; // Adjust the import path
+import { useAuth } from "@/providers/AuthProvider";
 
 // --- Reusable Form Field Component (No changes needed) ---
-const FormField = ({ label, placeholder, value, onChangeText, keyboardType = 'default', multiline = false, unit }) => (
+const FormField = ({
+  label,
+  placeholder,
+  value,
+  onChangeText,
+  keyboardType = "default",
+  multiline = false,
+  unit,
+}) => (
   <View className="mb-6">
     <Text className="text-base font-bold text-gray-800 mb-2">{label}</Text>
     <View className="flex-row items-center bg-white border border-gray-300 rounded-2xl">
@@ -23,7 +40,11 @@ const FormField = ({ label, placeholder, value, onChangeText, keyboardType = 'de
         multiline={multiline}
         numberOfLines={multiline ? 4 : 1}
       />
-      {unit && <Text className="p-4 text-base text-gray-500 font-semibold">{unit}</Text>}
+      {unit && (
+        <Text className="p-4 text-base text-gray-500 font-semibold">
+          {unit}
+        </Text>
+      )}
     </View>
   </View>
 );
@@ -35,17 +56,19 @@ const AddProductScreen = () => {
   const { user } = useAuth();
 
   // State for all form fields
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [stock, setStock] = useState('');
-  const [unit, setUnit] = useState(''); // Field for stock unit (kg, ton, etc.)
-  const [quality, setQuality] = useState(''); // <-- 1. ADD STATE FOR QUALITY
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
+  const [unit, setUnit] = useState(""); // Field for stock unit (kg, ton, etc.)
+  const [quality, setQuality] = useState(""); // <-- 1. ADD STATE FOR QUALITY
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // Image Picker Logic (No changes)
-  const pickImage = async () => { /* ... */ };
+  const pickImage = async () => {
+    /* ... */
+  };
 
   // --- Submission Handler ---
   const handlePublish = async () => {
@@ -75,9 +98,8 @@ const AddProductScreen = () => {
       await productService.createProduct(productData);
 
       Alert.alert("Success!", "Your product has been published.", [
-        { text: "OK", onPress: () => router.back() }
+        { text: "OK", onPress: () => router.back() },
       ]);
-      
     } catch (error) {
       console.error("Failed to create product:", error);
       if (error.response) {
@@ -90,10 +112,13 @@ const AddProductScreen = () => {
   };
 
   return (
-    <SafeAreaView edges={['bottom']} style={{ flex: 1 }} className="bg-white">
+    <SafeAreaView edges={["bottom"]} style={{ flex: 1 }} className="bg-white">
       {/* Header with back button */}
       <View className="flex-row items-center justify-between p-4 border-b border-gray-200">
-        <TouchableOpacity onPress={() => router.back()} className="p-2">
+        <TouchableOpacity
+          onPress={() => router.replace("/(farmer)")}
+          className="p-2"
+        >
           <ArrowLeft size={24} color="#1f2937" />
         </TouchableOpacity>
         <Text className="text-xl font-bold text-gray-800">Add New Product</Text>
@@ -101,55 +126,80 @@ const AddProductScreen = () => {
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 24 }}>
-        <FormField label="Product Name" placeholder="e.g., Fresh Potato" value={name} onChangeText={setName} />
-        
+        <FormField
+          label="Product Name"
+          placeholder="e.g., Fresh Potato"
+          value={name}
+          onChangeText={setName}
+        />
+
         {/* --- 3. ADD UI FOR THE NEW FIELDS --- */}
         <View className="flex-row justify-between">
           <View className="w-[48%]">
-            <FormField label="Stock" placeholder="100" keyboardType="numeric" value={stock} onChangeText={setStock} />
+            <FormField
+              label="Stock"
+              placeholder="100"
+              keyboardType="numeric"
+              value={stock}
+              onChangeText={setStock}
+            />
           </View>
           <View className="w-[48%]">
-            <FormField label="Unit" placeholder="kg, Ton, etc." value={unit} onChangeText={setUnit} />
+            <FormField
+              label="Unit"
+              placeholder="kg, Ton, etc."
+              value={unit}
+              onChangeText={setUnit}
+            />
           </View>
         </View>
-        
+
         <View className="flex-row justify-between">
           <View className="w-[48%]">
-            <FormField label="Price per Unit" placeholder="100" keyboardType="numeric" value={price} onChangeText={setPrice} unit="DZD" />
+            <FormField
+              label="Price per Unit"
+              placeholder="100"
+              keyboardType="numeric"
+              value={price}
+              onChangeText={setPrice}
+              unit="DZD"
+            />
           </View>
           <View className="w-[48%]">
-            <FormField label="Quality" placeholder="A, B, Grade 1..." value={quality} onChangeText={setQuality} />
+            <FormField
+              label="Quality"
+              placeholder="A, B, Grade 1..."
+              value={quality}
+              onChangeText={setQuality}
+            />
           </View>
         </View>
         {/* ------------------------------------- */}
 
-        <FormField 
-          label="Description" 
+        <FormField
+          label="Description"
           placeholder="e.g., Freshly harvested, ready for delivery."
-          multiline={true} 
-          value={description} 
+          multiline={true}
+          value={description}
           onChangeText={setDescription}
         />
 
         {/* Image Uploader Section (No changes) */}
-        <View className="mb-6">
-          {/* ... */}
-        </View>
-        
-        {images.length > 0 && (
-          <ScrollView horizontal>
-            {/* ... */}
-          </ScrollView>
-        )}
+        <View className="mb-6">{/* ... */}</View>
+
+        {images.length > 0 && <ScrollView horizontal>{/* ... */}</ScrollView>}
       </ScrollView>
 
       {/* Footer with Action Buttons (No changes) */}
       <View className="flex-row justify-between p-4 bg-white border-t border-gray-200">
-        <TouchableOpacity onPress={() => router.replace('/(farmer)')} className="w-[48%] bg-gray-200 py-4 rounded-2xl items-center">
+        <TouchableOpacity
+          onPress={() => router.replace("/(farmer)")}
+          className="w-[48%] bg-gray-200 py-4 rounded-2xl items-center"
+        >
           <Text className="text-base font-bold text-gray-800">Cancel</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
-          className={`w-[48%] py-4 rounded-2xl items-center flex-row justify-center ${loading ? 'bg-green-400' : 'bg-green-700'}`}
+        <TouchableOpacity
+          className={`w-[48%] py-4 rounded-2xl items-center flex-row justify-center ${loading ? "bg-green-400" : "bg-green-700"}`}
           onPress={handlePublish}
           disabled={loading}
         >

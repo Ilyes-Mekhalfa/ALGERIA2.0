@@ -156,9 +156,9 @@ const ProductDetailsScreen = () => {
             {product.price} DZD
           </Text>
         </View>
-        <TouchableOpacity className="bg-green-700 h-14 rounded-2xl flex-1 ml-4 flex-row items-center justify-center">
-          
-          <Text className="text-white font-bold text-lg ml-2">Edit</Text>
+        <TouchableOpacity onPress={() => router.replace(`/buy/${product._id}`)} className="bg-green-700 h-14 rounded-2xl flex-1 ml-4 flex-row items-center justify-center">
+          <ShoppingCart size={24} color="white" />
+          <Text className="text-white font-bold text-lg ml-2">Buy</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

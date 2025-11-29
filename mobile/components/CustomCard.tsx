@@ -3,10 +3,12 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Star } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 
 const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=500';
 
 const CustomCard = ({ item }) => {
+    const router = useRouter();
   // Safety check to prevent crashes if item is invalid
   if (!item) {
     return null;
@@ -17,7 +19,7 @@ const CustomCard = ({ item }) => {
 
   return (
     
-    <View  className="flex-1 mx-2 bg-white rounded-2xl shadow-lg shadow-black/10 overflow-hidden w-44">
+    <TouchableOpacity onPress={() => router.push(`/product/${item._id}`)}  className="flex-1 mx-2 bg-white rounded-2xl shadow-lg shadow-black/10 overflow-hidden w-44">
       
       {/* Image and Quality Badge */}
       <View>
@@ -59,7 +61,7 @@ const CustomCard = ({ item }) => {
           </Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
