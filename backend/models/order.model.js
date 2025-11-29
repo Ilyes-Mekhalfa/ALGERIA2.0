@@ -25,6 +25,10 @@ const OrderSchema = new mongoose.Schema({
         type : Date,
         default : Date.now()
     }
+    // profitMargin : {
+    //     type : Number,
+    //     required : [true , 'profit margin is required']
+    // }
 })
 
 const Order = mongoose.model('Order', OrderSchema)

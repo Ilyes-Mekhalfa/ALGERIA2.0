@@ -1,6 +1,7 @@
 import order from '../models/order.model.js'
 import { catchError } from '../utils/catchError.js';
 import OrderService from '../services/order.services.js';
+import User from '../models/user.model.js';
 
 export const createOrder = catchError(async (req ,res , next)=>{
     const orderData = req.body;

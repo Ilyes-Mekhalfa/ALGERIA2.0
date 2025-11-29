@@ -122,3 +122,15 @@ export const resetPassword = catchError(async(req , res , next)=>{
      
 
 })
+
+export const afilliateRegister = catchError(async (req , res ,next)=>{
+    //get the user data from the req
+    const {refferedBy , ...userData} = req.body;
+
+    const afilliate = await UserService.affiliateRegister(refferedBy , userData)
+
+    return res .status(200).json({
+        success : true,
+        data :afilliate
+    })
+})
