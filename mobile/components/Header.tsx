@@ -10,10 +10,7 @@ type HeaderProps = {
   onBellPress?: () => void;
 };
 
-const Header: React.FC<HeaderProps> = ({
-  count = 5,
-  onBellPress,
-}) => {
+const Header: React.FC<HeaderProps> = ({ count = 5, onBellPress }) => {
   const router = useRouter();
   // --- 2. GET THE USER OBJECT FROM THE AUTH CONTEXT ---
   const { user } = useAuth();
@@ -54,7 +51,10 @@ const Header: React.FC<HeaderProps> = ({
       {/* RIGHT SIDE — Chat + Bell (No changes needed) */}
       <View className="flex-row items-center">
         {/* BELL ICON */}
-        <TouchableOpacity onPress={onBellPress} className="relative">
+        <TouchableOpacity
+          onPress={() => router.push("/notification/notification")}
+          className="relative"
+        >
           <Ionicons name="notifications-outline" size={26} color="#333" />
           {count > 0 && (
             <View
