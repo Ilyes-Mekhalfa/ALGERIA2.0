@@ -14,7 +14,7 @@ import ForgotPasswordPage from "./routes/Auth/ForgotPassword";
 
 function RootRedirect() {
   const user = useAuthStore((s) => s.user);
-  return user ? <Navigate to="/admin" replace /> : <Navigate to="/signin" replace />;
+  return user ? <Navigate to="/admin" replace /> : <Navigate to="/login" replace />;
 }
 
 export const router = createBrowserRouter([
