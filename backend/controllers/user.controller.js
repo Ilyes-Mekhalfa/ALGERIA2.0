@@ -10,6 +10,16 @@ export const getAllUsers = catchError(async (req , res , next)=>{
     })
 })
 
+export const getProfile = catchError(async (req , res, next)=>{
+    const id = req.user.id;
+    const user = await UserService.getUserById(id)
+
+    return res.status(200).json({
+        success : true,
+        user
+    })
+})
+
 export const updateUser = catchError(async (req , res , next) =>{
     const id = req.user.id
     const updatedData = req.body

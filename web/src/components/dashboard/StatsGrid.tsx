@@ -7,7 +7,7 @@ export default function StatsGrid() {
 
   if (isLoading || !data) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <OverviewCard title="Producers" value="—" />
         <OverviewCard title="Active Listings" value="—" />
         <OverviewCard title="Orders (This Week)" value="—" />
@@ -17,7 +17,7 @@ export default function StatsGrid() {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
       <OverviewCard title="Producers" value={data.producers} />
       <OverviewCard title="Active Listings" value={data.activeListings} />
       <OverviewCard title="Orders (This Week)" value={data.weeklyOrders} />

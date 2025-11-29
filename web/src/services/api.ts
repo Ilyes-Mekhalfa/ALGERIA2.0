@@ -1,20 +1,56 @@
 // services/api.ts
 import axios from "axios";
+import useAuthStore from "../store/authStore";
 
 // ----------------------------------------------
 // 1. Create Axios instance
 // ----------------------------------------------
 const api = axios.create({
-  baseURL: "http://localhost:4000", // root so auth (mounted at '/') and api (mounted at '/api') both work
+  baseURL: "http://localhost:4000", // Backend server runs on port 4000 (from .env)
   headers: { "Content-Type": "application/json" },
   withCredentials: true, // include httpOnly cookies set by backend
 });
+
+// Request interceptor: Add authorization token to all requests
+api.interceptors.request.use(
+  (config) => {
+    // Priority: localStorage (authoritative) → authStore (fallback)
+    let token = localStorage.getItem("authToken");
+    
+    if (!token) {
+      const authStore = useAuthStore.getState();
+      token = authStore.user?.token;
+    }
+    
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor: Handle auth errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear auth state on unauthorized
+      const authStore = useAuthStore.getState();
+      authStore.logout();
+      localStorage.removeItem("authToken");
+      // Optionally redirect to login
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 // ----------------------------------------------
 // 2. Toggle mock mode
 // ----------------------------------------------
 // Set to false when backend is ready
-const USE_MOCK = false;
+const USE_MOCK = true;
 
 // ----------------------------------------------
 // 3. MOCK Data
@@ -99,13 +135,31 @@ const apiWrapper = {
       await wait(500);
       return { data: mockData.orders };
     }
-    // Backend currently doesn't expose orders endpoint — return empty by default
     try {
-      console.log("01");
+      // Call /orders endpoint - returns all orders for admin users
+      console.log("Fetching orders from backend...");
       const res = await api.get("/orders");
-      console.log(res);
-      return { data: res.data };
-    } catch (err) {
+      console.log("Orders response:", res);
+      const payload = res.data?.data ?? res.data;
+
+      // Map backend order shape to frontend order shape
+      const orders = Array.isArray(payload)
+        ? payload.map((o: any) => ({
+            id: o._id ?? o.id,
+            buyer: o.buyerName ?? o.buyer ?? "Unknown",
+            product: o.productName ?? o.product ?? "Unknown",
+            status: o.status ?? "pending",
+            total: o.totalAmount ?? o.total ?? 0,
+          }))
+        : [];
+
+      return { data: orders };
+    } catch (err: any) {
+      console.error("Error fetching orders:", err);
+      // Fallback to mock data on error
+      if (err.code === 'ERR_NETWORK' || err.code === 'ECONNREFUSED') {
+        return { data: mockData.orders };
+      }
       return { data: [] };
     }
   },
@@ -116,22 +170,31 @@ const apiWrapper = {
       await wait(500);
       return { data: mockData.listings };
     }
-    // Backend products are mounted at '/api' and return { success, data: items, pagination }
-    const res = await api.get("/api");
-    const payload = res.data && (res.data.data ?? res.data.items ?? res.data);
+    try {
+      // Call /products endpoint (requires authentication)
+      const res = await api.get("/products");
+      const payload = res.data?.data ?? res.data;
 
-    // Map backend product shape to frontend listing shape
-    const listings = Array.isArray(payload)
-      ? payload.map((p: any) => ({
-          id: p._id ?? p.id,
-          product: p.name ?? p.product ?? "",
-          producer: p.userId ? String(p.userId) : p.producer ?? "Unknown",
-          price: p.price ?? 0,
-          quantity: p.stock ?? p.quantity ?? 0,
-        }))
-      : [];
+      // Map backend product shape to frontend listing shape
+      const listings = Array.isArray(payload)
+        ? payload.map((p: any) => ({
+            id: p._id ?? p.id,
+            product: p.name ?? p.product ?? "",
+            producer: p.userId ? String(p.userId) : p.producer ?? "Unknown",
+            price: p.price ?? 0,
+            quantity: p.stock ?? p.quantity ?? 0,
+          }))
+        : [];
 
-    return { data: listings };
+      return { data: listings };
+    } catch (err: any) {
+      console.error("Error fetching listings:", err);
+      // Fallback to mock data when backend is unavailable or network error
+      if (err.code === 'ERR_NETWORK' || err.code === 'ECONNREFUSED') {
+        return { data: mockData.listings };
+      }
+      return { data: [] };
+    }
   },
 
   // ------- Users -------
@@ -140,11 +203,29 @@ const apiWrapper = {
       await wait(500);
       return { data: mockData.users };
     }
-    // Backend has no public /users route in this repo; return empty array to keep UI stable
     try {
-      const res = await api.get("/users");
-      return { data: res.data };
-    } catch (err) {
+      // Call /users/allUsers endpoint - returns all users (requires admin authorization)
+      const res = await api.get("/users/allUsers");
+      const payload = res.data?.data ?? res.data;
+
+      // Map backend user shape to frontend user shape
+      const users = Array.isArray(payload)
+        ? payload.map((u: any) => ({
+            id: u._id ?? u.id,
+            name: u.username ?? u.name ?? "Unknown",
+            role: u.role ?? "user",
+            phone: u.phone ?? "—",
+            email: u.email ?? "—",
+          }))
+        : [];
+
+      return { data: users };
+    } catch (err: any) {
+      console.error("Error fetching users:", err);
+      // Fallback to mock data on error
+      if (err.code === 'ERR_NETWORK' || err.code === 'ECONNREFUSED') {
+        return { data: mockData.users };
+      }
       return { data: [] };
     }
   },
@@ -169,8 +250,9 @@ const apiWrapper = {
         await wait(400);
         return {
         data: {
-            labels: ["Jan", "Feb", "Mar", "Apr"],
-            values: [60, 70, 65, 80],
+            // Full semester (6 months) mock data
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            values: [60, 70, 65, 80, 75, 85],
         },
         };
     }
@@ -187,31 +269,72 @@ const apiWrapper = {
     if (USE_MOCK) {
       await wait(500);
       if (email === "admin@example.com" && password === "password") {
-        return { data: { id: 1, name: "Admin User", email } };
+        const mockToken = "mock-token-" + Date.now();
+        localStorage.setItem("authToken", mockToken);
+        return { data: { data: { id: 1, name: "Admin User", email, token: mockToken } } };
       }
       const err: any = new Error("Request failed");
       err.response = { status: 401, data: { message: "Invalid credentials" } };
       throw err;
     }
-    // auth routes are mounted at '/' in backend
-    return api.post("/login", { email, password });
+    try {
+      // Backend: POST /login returns { success, message, data: { user, token } }
+      const response = await api.post("/login", { email, password });
+      // Extract token from response
+      const token = response.data?.data?.token || response.data?.token;
+      if (token) {
+        localStorage.setItem("authToken", token);
+      }
+      return response;
+    } catch (error) {
+      throw error;
+    }
   },
 
   async register(name: string, email: string, password: string) {
     if (USE_MOCK) {
       await wait(700);
-      return { data: { id: Date.now(), name, email } };
+      const mockToken = "mock-token-" + Date.now();
+      localStorage.setItem("authToken", mockToken);
+      return { data: { data: { id: Date.now(), name, email, token: mockToken } } };
     }
-    // backend register route is '/register'
-    return api.post("/register", { name, email, password });
+    try {
+      // Backend: POST /register expects { username, email, password, confirmPassword, role }
+      // Returns { success, message, data: { user, token } }
+      const response = await api.post("/register", { 
+        username: name, 
+        email, 
+        password,
+        confirmPassword: password,
+        role: "farmer" // default role, adjust as needed
+      });
+      // Extract token from response
+      const token = response.data?.data?.token || response.data?.token;
+      if (token) {
+        localStorage.setItem("authToken", token);
+      }
+      return response;
+    } catch (error) {
+      throw error;
+    }
   },
 
   async logout() {
     if (USE_MOCK) {
       await wait(200);
+      localStorage.removeItem("authToken");
       return { data: { message: "Logged out" } };
     }
-    return api.post("/logout");
+    try {
+      // Backend: POST /logout (requires auth header with token)
+      const response = await api.post("/logout");
+      localStorage.removeItem("authToken");
+      return response;
+    } catch (error) {
+      // Still clear token even if request fails
+      localStorage.removeItem("authToken");
+      throw error;
+    }
   },
 };
 

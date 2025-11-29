@@ -18,17 +18,29 @@ export default function SignInPage() {
 
     try {
       const res = await api.login(email, password);
-      const user = res?.data;
-      if (user) {
-        setUser(user);
-        navigate("/admin/dashboard");
-      } else {
-        setError("Invalid credentials");
+      // Backend response: { success, message, data: { user, token } }
+      const { data } = res;
+      const userData = data?.data || data;
+      const user = userData?.user || userData;
+      const token = userData?.token;
+      
+      // Validate token exists
+      if (!token) {
+        setError("No token received from server");
+        return;
       }
+      
+      // Store user with token
+      setUser({ ...user, token });
+      
+      // Small delay to ensure state is updated before navigation
+      setTimeout(() => {
+        navigate("/admin/dashboard");
+      }, 100);
     } catch (err: any) {
-      const msg = err?.response?.data?.message || "An error occurred during sign in";
+      const msg = err?.response?.data?.message || err?.response?.data?.errors?.[0] || "An error occurred during sign in";
       setError(msg);
-      console.error(err);
+      console.error("Sign in error:", err);
     } finally {
       setIsLoading(false);
     }
