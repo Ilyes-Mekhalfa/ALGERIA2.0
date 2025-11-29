@@ -1,11 +1,14 @@
 // In app/_layout.tsx
 
-import { Slot } from "expo-router";
+import { Slot, useRouter } from "expo-router";
 import { AuthProvider, useAuth } from "../providers/AuthProvider";
-import { useEffect } from "react";
-import { useRouter } from "expo-router";
+import { useEffect, useCallback } from "react"; // 1. Added useCallback
 import { ActivityIndicator, View } from "react-native";
+import * as SplashScreen from "expo-splash-screen"; // 2. Added Splash Import
 import "./global.css";
+
+// 3. Prevent the splash screen from auto-hiding immediately
+SplashScreen.preventAutoHideAsync();
 
 const InitialLayout = () => {
   const { user, loading } = useAuth();
@@ -23,18 +26,32 @@ const InitialLayout = () => {
     }
     // If the user IS logged in, redirect to their role's group.
     else if (user.role) {
-      router.replace(`/${user.role === "farmer" ? "(farmer)" : "(supplier)"}`); // Add more roles
+      router.replace(`/(driver)`); // Add more roles
     }
   }, [user, loading, router]);
 
-  // While loading, show a spinner. If not loading, <Slot /> will render
-  // the correct page (either from the (auth) group or a tab group).
-  return loading ? (
-    <View style={{ flex: 1, justifyContent: "center" }}>
-      <ActivityIndicator size="large" />
+  // 4. Create a callback to hide the splash screen once the app is NOT loading
+  const onLayoutRootView = useCallback(async () => {
+    if (!loading) {
+      await SplashScreen.hideAsync();
+    }
+  }, [loading]);
+
+  // While loading, show a spinner (Note: The Native Splash will actually cover this
+  // until loading finishes, preventing any white screen flash).
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  // 5. Wrap the Slot in a View that triggers the onLayout event
+  return (
+    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      <Slot />
     </View>
-  ) : (
-    <Slot />
   );
 };
 

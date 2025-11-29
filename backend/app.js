@@ -20,7 +20,7 @@ import authRouter from './routes/auth.routes.js'
 import productRoutes from './routes/product.routes.js'
 import recommendationRoutes from './routes/recommendation.routes.js'
 import orderRoutes from './routes/order.routes.js'
-
+import userRoutes from './routes/user.routes.js'
 
 //create express app
 const app = express();
@@ -116,6 +116,7 @@ app.use('/', authRouter)
 app.use('/products' , productRoutes)
 app.use('/recommendations', recommendationRoutes)
 app.use('/orders', orderRoutes)
+app.use('/users',userRoutes)
 
 // Handle non-existing routes
 app.all(/.*/, (req, res, next) => {

@@ -12,16 +12,16 @@ import SignInPage from "./routes/Auth/SignIn";
 import SignUpPage from "./routes/Auth/SignUp";
 import ForgotPasswordPage from "./routes/Auth/ForgotPassword";
 
-// function RootRedirect() {
-//   const user = useAuthStore((s) => s.user);
-//   return user ? <Navigate to="/admin" replace /> : <Navigate to="/signin" replace />;
-// }
+function RootRedirect() {
+  const user = useAuthStore((s) => s.user);
+  return user ? <Navigate to="/admin" replace /> : <Navigate to="/login" replace />;
+}
 
 export const router = createBrowserRouter([
-  // {
-  //   path: "/",
-  //   element: <RootRedirect />,
-  // },
+  {
+    path: "/",
+    element: <RootRedirect />,
+  },
   {
     path: "/login",
     element: <SignInPage />,
