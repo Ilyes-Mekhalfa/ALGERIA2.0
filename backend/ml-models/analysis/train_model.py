@@ -90,9 +90,7 @@ encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
 X_encoded = encoder.fit_transform(X)
 print("4. Data prepared for model (features selected and encoded).")
 
-# --- Step 5: Train the Machine Learning Model ---
-# Split data into 80% for training and 20% for testing
-X_train, X_test, y_train, y_test = train_test_split(X_encoded, y, test_size=0.2, random_state=42, stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(X_encoded, y, test_size=0.2, random_state=42)
 
 # Initialize and train the Random Forest Classifier
 model = RandomForestClassifier(n_estimators=100, random_state=42)
