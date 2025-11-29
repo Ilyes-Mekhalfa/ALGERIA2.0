@@ -4,7 +4,7 @@ import  {generateToken}  from '../utils/jwt.js';
 import crypto from 'crypto';
 
 class UserService {
-    async register({ username, email, password, referralCode }) {
+    async register({ username, email, password, role, referralCode }) {
     // Check if user already exists
     const existingUser = await User.findOne({ email});
 
@@ -25,6 +25,7 @@ class UserService {
       username,
       email,
       password,
+      role,
       referralCode: newReferralCode
     };
 
