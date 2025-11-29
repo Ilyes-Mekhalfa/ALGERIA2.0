@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Linking, ActivityIndicator } from 'react-native';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  ScrollView, 
+  Alert, 
+  ActivityIndicator,
+  KeyboardAvoidingView, // Import KeyboardAvoidingView
+  Platform // Import Platform
+} from 'react-native';
 import { useAuth } from '@/providers/AuthProvider';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -34,18 +44,6 @@ const RoleButton = ({ icon, label, isSelected, onPress }) => (
   </TouchableOpacity>
 );
 
-// --- Reusable, Styled Navigation Button ---
-const NavButton = ({ onPress, text, icon: Icon, disabled = false }) => (
-  <TouchableOpacity
-    onPress={onPress}
-    disabled={disabled}
-    className={`flex-row items-center justify-center p-4 rounded-full ${disabled ? 'bg-gray-300' : 'bg-green-700'}`}
-  >
-    <Text className="text-white text-lg font-bold mr-2">{text}</Text>
-    {Icon && <Icon size={22} color="#fff" />}
-  </TouchableOpacity>
-);
-
 export default function Register() {
   const { register: registerUser } = useAuth();
   const router = useRouter();
@@ -74,7 +72,6 @@ export default function Register() {
     setLoading(true);
     try {
       const userData = { username, email, password, confirmPassword, phone, location, role };
-      console.log("User Data:", userData);
       await registerUser(userData);
       // Navigation is handled by the context
     } catch (error) {
@@ -139,11 +136,19 @@ export default function Register() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView contentContainerStyle={{ padding: 24, flexGrow: 1 }}>
-        
-        {/* Header and Progress Bar */}
-        <View className="mb-8">
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView className="flex-1 bg-white">
+        <ScrollView 
+          contentContainerStyle={{ padding: 24, flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled" // This can also help with tapping outside to dismiss
+        >
+          
+          {/* Header and Progress Bar */}
+          <View className="mb-8">
             <TouchableOpacity onPress={() => router.replace('/login')} className="mb-4">
                 <Text className="text-green-700 font-bold">← Back to Login</Text>
             </TouchableOpacity>
@@ -152,58 +157,59 @@ export default function Register() {
             </View>
             <Progress.Bar
                 progress={step / totalSteps}
-                width={null} // Makes it fill the container
+                width={null}
                 height={6}
-                color={'#22c55e'} // Green-500
-                unfilledColor={'#e5e7eb'} // Gray-200
+                color={'#22c55e'}
+                unfilledColor={'#e5e7eb'}
                 borderWidth={0}
                 className="mt-2"
             />
-        </View>
+          </View>
 
-        {/* Dynamic Step Content */}
-        <View className="flex-1">
-          {renderStep()}
-        </View>
+          {/* Dynamic Step Content */}
+          <View className="flex-1">
+            {renderStep()}
+          </View>
 
-        {/* Navigation Buttons */}
-        <View className="mt-10">
-          {step > 1 && (
-            <TouchableOpacity onPress={back} className="absolute bottom-6 left-0">
-              <View className="flex-row items-center">
-                <ArrowLeft size={20} color="#6b7280" />
-                <Text className="text-gray-500 font-bold text-base ml-1">Back</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-
-          {step < totalSteps && (
-            <View className="items-end">
-              <TouchableOpacity onPress={next} className="bg-green-700 w-16 h-16 rounded-full items-center justify-center">
-                <ArrowRight size={32} color="#fff" />
+          {/* Navigation Buttons */}
+          <View className="mt-10">
+            {step > 1 && (
+              <TouchableOpacity onPress={back} className="absolute bottom-6 left-0">
+                <View className="flex-row items-center">
+                  <ArrowLeft size={20} color="#6b7280" />
+                  <Text className="text-gray-500 font-bold text-base ml-1">Back</Text>
+                </View>
               </TouchableOpacity>
-            </View>
-          )}
+            )}
 
-          {step === totalSteps && (
-            <TouchableOpacity
-              onPress={handleRegister}
-              disabled={loading}
-              className={`flex-row items-center justify-center p-4 rounded-full ${loading ? 'bg-green-400' : 'bg-green-700'}`}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <>
-                  <Text className="text-white text-lg font-bold mr-2">Create Account</Text>
-                  <Check size={22} color="#fff" />
-                </>
-              )}
-            </TouchableOpacity>
-          )}
-        </View>
-        
-      </ScrollView>
-    </SafeAreaView>
+            {step < totalSteps && (
+              <View className="items-end">
+                <TouchableOpacity onPress={next} className="bg-green-700 w-16 h-16 rounded-full items-center justify-center">
+                  <ArrowRight size={32} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {step === totalSteps && (
+              <TouchableOpacity
+                onPress={handleRegister}
+                disabled={loading}
+                className={`flex-row items-center justify-center p-4 rounded-full ${loading ? 'bg-green-400' : 'bg-green-700'}`}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <>
+                    <Text className="text-white text-lg font-bold mr-2">Create Account</Text>
+                    <Check size={22} color="#fff" />
+                  </>
+                )}
+              </TouchableOpacity>
+            )}
+          </View>
+          
+        </ScrollView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }

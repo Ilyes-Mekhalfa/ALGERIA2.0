@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
-import { useRouter } from "expo-router";
+import { useRootNavigationState, useRouter, useSegments } from "expo-router";
 import api from "../utils/axios";
 
 const AuthContext = createContext(null);
@@ -84,4 +84,37 @@ export function useAuth() {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+}
+
+export function useProtectedRoute() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const segments = useSegments();
+  const navigationState = useRootNavigationState();
+
+  useEffect(() => {
+    // Wait until the navigation state is ready and we're done loading the user.
+    if (!navigationState?.key || loading) {
+      return;
+    }
+
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (!user && !inAuthGroup) {
+      // If the user is not signed in and the initial segment is not anything
+      // in the auth group, then redirect to the login page.
+      router.replace('/(auth)/login');
+    } else if (user && inAuthGroup) {
+      // If the user is signed in and the initial segment is in the auth group,
+      // then redirect to the correct role-based tab group.
+      if (user.role === 'farmer') {
+        router.replace('/(farmer)');
+      } else if (user.role === 'buyer') {
+        router.replace('/(supplier)');
+      } else {
+        // Fallback if role is unknown
+        router.replace('/(auth)/login');
+      }
+    }
+  }, [user, segments, navigationState, loading, router]);
 }
