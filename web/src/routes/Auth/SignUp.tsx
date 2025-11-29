@@ -57,18 +57,29 @@ export default function SignUpPage() {
 
     try {
       const res = await api.register(formData.fullName, formData.email, formData.password);
-      const user = res?.data;
-      if (user) {
-        setUser(user);
-        navigate("/admin/dashboard");
-      } else {
-        setErrors({ submit: "Registration failed" });
+      // Backend response: { success, message, data: { user, token } }
+      const { data } = res;
+      const userData = data?.data || data;
+      const user = userData?.user || userData;
+      const token = userData?.token;
+      
+      // Validate token exists
+      if (!token) {
+        setErrors({ submit: "No token received from server" });
+        return;
       }
-    } catch (err) {
-      const e: any = err;
-      const msg = e?.response?.data?.message || "An error occurred during sign up";
+      
+      // Store user with token
+      setUser({ ...user, token });
+      
+      // Small delay to ensure state is updated before navigation
+      setTimeout(() => {
+        navigate("/admin/dashboard");
+      }, 100);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.response?.data?.errors?.[0] || "An error occurred during sign up";
       setErrors({ submit: msg });
-      console.error(err);
+      console.error("Sign up error:", err);
     } finally {
       setIsLoading(false);
     }

@@ -11,7 +11,6 @@ export default function UsersTable() {
             <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Name</th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Role</th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Phone</th>
-            <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
 
@@ -29,9 +28,6 @@ export default function UsersTable() {
               <td className="px-4 py-3 text-left text-sm text-gray-700">{row.name}</td>
               <td className="px-4 py-3 text-left text-sm text-gray-700">{row.role ?? "—"}</td>
               <td className="px-4 py-3 text-left text-sm text-gray-700">{row.phone ?? row.email ?? "—"}</td>
-              <td className="px-4 py-3 text-sm">
-                <button className="px-2 py-1 text-sm rounded bg-primary/10 text-primary hover:bg-primary/20">View</button>
-              </td>
             </tr>
           ))}
         </tbody>
