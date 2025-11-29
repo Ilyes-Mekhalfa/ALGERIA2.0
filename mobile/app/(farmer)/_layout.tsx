@@ -30,16 +30,16 @@ export default function TabLayout() {
 
       {/* 📌 Tab 3: Analytics (Mapped to "analytics" in CustomTabBar) */}
       <Tabs.Screen
-        name="market"
+        name="orders"
         options={{
-          title: "Market",
+          title: "Orders",
         }}
       />
 
       <Tabs.Screen
-        name="profile"
+        name="payments"
         options={{
-          title: "Profile",
+          title: "Payments",
         }}
       />
     </Tabs>

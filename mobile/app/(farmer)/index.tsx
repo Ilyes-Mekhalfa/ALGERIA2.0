@@ -39,7 +39,7 @@ const Index = () => {
         ListHeaderComponent={
           <>
             <Header />
-            <View className="flex-row justify-evenly items-center mt-6 mb-8">
+            <View className="flex-row justify-between items-center mt-6 mb-8">
               <Text className="text-3xl font-extrabold">Dashboard</Text>
               <TouchableOpacity
                 onPress={() => router.replace("/new")}

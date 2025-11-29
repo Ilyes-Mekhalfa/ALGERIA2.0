@@ -1,23 +1,9 @@
 import PriceChart from "../../components/dashboard/PriceChart";
 import { PriceAnalyticsContext } from "../../context/PriceAnalyticsContext";
-import api from "../../services/api";
-import { useQuery } from "@tanstack/react-query";
+import usePriceAnalytics from "../../hooks/usePriceAnalytics";
 
 export default function AnalyticsPage() {
-  const { data } = useQuery({
-    queryKey: ["price-analytics"],
-    queryFn: async () => {
-      // expecting backend (or mock) to return:
-      // { labels: [...], values: [...] }
-      const res = await api.getPriceAnalytics?.();
-
-      // fallback for mock if not implemented yet
-      return res?.data ?? {
-        labels: ["Jan", "Feb", "Mar", "Apr"],
-        values: [60, 70, 65, 80],
-      };
-    },
-  });
+  const { data } = usePriceAnalytics();
 
   return (
     <PriceAnalyticsContext.Provider

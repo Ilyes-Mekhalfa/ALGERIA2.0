@@ -10,14 +10,15 @@ router
     .get(authenticate , authorize('admin') , orderController.getAllOrders)
 
 router
-    .route('/my-orders')
-    .get(authenticate , orderController.getMyOrders)
+    .route('/my-orders') // The :id is removed
+    .get(authenticate, orderController.getMyOrders)
 
 router
     .route('/:id')
     .get(authenticate , orderController.getOrder)
     .patch(authenticate , orderController.updateOrder)
     .delete(authenticate , orderController.deleteOrder)
+    
 
 
 export default router

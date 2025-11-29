@@ -35,8 +35,8 @@ const Userschema = new mongoose.Schema({
     },
     role : {
         type : String,
-        enum : ['admin', 'supplier','farmer', 'buyer'],
-        // default : 'buyer',
+        enum : ['admin', 'farmer', 'buyer'],
+        default : 'buyer',
         require : [true , 'role is required filed']
     },
     createAt :{

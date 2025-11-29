@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
-import { useRouter } from "expo-router";
+import { useRootNavigationState, useRouter, useSegments } from "expo-router";
 import api from "../utils/axios";
 
 const AuthContext = createContext(null);
@@ -84,4 +84,39 @@ export function useAuth() {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+}
+
+
+
+export function useProtectedRoute() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const segments = useSegments();
+  const navigationState = useRootNavigationState();
+
+  useEffect(() => {
+    // 1. Wait until navigation is fully ready and user loading is complete.
+    if (!navigationState?.key || loading) {
+      return;
+    }
+
+    const inAuthGroup = segments[0] === '(auth)';
+    
+    // --- THIS IS THE KEY CHANGE ---
+    // We need to know if the user is in ANY of the protected tab groups.
+    const inApp = segments[0] === '(farmer)' || segments[0] === '(buyer)';
+    // Add other roles here, e.g., || segments[0] === '(supplier)'
+    // ----------------------------
+
+    if (!user && !inAuthGroup) {
+      // If the user is not signed in and is trying to access anything
+      // other than the auth pages, redirect to login.
+      router.replace('/(auth)/login');
+    } else if (user && !inApp) {
+      // If the user IS signed in but is currently on a page
+      // that is NOT a protected app page (e.g., they are on the login page),
+      // redirect them to their correct home.
+      router.replace(`/${user.role === 'farmer' ? '(farmer)' : '(supplier)'}`); // Add more roles here
+    }
+  }, [user, segments, navigationState, loading, router]);
 }

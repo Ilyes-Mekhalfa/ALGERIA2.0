@@ -5,7 +5,7 @@ import axios from "axios";
 // 1. Create Axios instance
 // ----------------------------------------------
 const api = axios.create({
-  baseURL: "http://localhost:3000/api", // Change ONLY this later
+  baseURL: "http://localhost:4000", // root so auth (mounted at '/') and api (mounted at '/api') both work
   headers: { "Content-Type": "application/json" },
   withCredentials: true, // include httpOnly cookies set by backend
 });
@@ -99,7 +99,15 @@ const apiWrapper = {
       await wait(500);
       return { data: mockData.orders };
     }
-    return api.get("/orders");
+    // Backend currently doesn't expose orders endpoint — return empty by default
+    try {
+      console.log("01");
+      const res = await api.get("/orders");
+      console.log(res);
+      return { data: res.data };
+    } catch (err) {
+      return { data: [] };
+    }
   },
 
   // ------- Listings -------
@@ -108,7 +116,22 @@ const apiWrapper = {
       await wait(500);
       return { data: mockData.listings };
     }
-    return api.get("/listings");
+    // Backend products are mounted at '/api' and return { success, data: items, pagination }
+    const res = await api.get("/api");
+    const payload = res.data && (res.data.data ?? res.data.items ?? res.data);
+
+    // Map backend product shape to frontend listing shape
+    const listings = Array.isArray(payload)
+      ? payload.map((p: any) => ({
+          id: p._id ?? p.id,
+          product: p.name ?? p.product ?? "",
+          producer: p.userId ? String(p.userId) : p.producer ?? "Unknown",
+          price: p.price ?? 0,
+          quantity: p.stock ?? p.quantity ?? 0,
+        }))
+      : [];
+
+    return { data: listings };
   },
 
   // ------- Users -------
@@ -117,7 +140,13 @@ const apiWrapper = {
       await wait(500);
       return { data: mockData.users };
     }
-    return api.get("/users");
+    // Backend has no public /users route in this repo; return empty array to keep UI stable
+    try {
+      const res = await api.get("/users");
+      return { data: res.data };
+    } catch (err) {
+      return { data: [] };
+    }
   },
 
   // ------- Shipments -------
@@ -126,7 +155,13 @@ const apiWrapper = {
       await wait(500);
       return { data: mockData.shipments };
     }
-    return api.get("/shipments");
+    // No shipments endpoint in backend — return empty
+    try {
+      const res = await api.get("/shipments");
+      return { data: res.data };
+    } catch (err) {
+      return { data: [] };
+    }
   },
 
   async getPriceAnalytics() {
@@ -139,7 +174,12 @@ const apiWrapper = {
         },
         };
     }
-    return api.get("/analytics/prices");
+    try {
+      const res = await api.get("/analytics/prices");
+      return { data: res.data };
+    } catch (err) {
+      return { data: { labels: [], values: [] } };
+    }
     },
 
   // ------- Auth -------
@@ -153,7 +193,8 @@ const apiWrapper = {
       err.response = { status: 401, data: { message: "Invalid credentials" } };
       throw err;
     }
-    return api.post("/auth/login", { email, password });
+    // auth routes are mounted at '/' in backend
+    return api.post("/login", { email, password });
   },
 
   async register(name: string, email: string, password: string) {
@@ -161,7 +202,8 @@ const apiWrapper = {
       await wait(700);
       return { data: { id: Date.now(), name, email } };
     }
-    return api.post("/auth/register", { name, email, password });
+    // backend register route is '/register'
+    return api.post("/register", { name, email, password });
   },
 
   async logout() {
@@ -169,7 +211,7 @@ const apiWrapper = {
       await wait(200);
       return { data: { message: "Logged out" } };
     }
-    return api.post("/auth/logout");
+    return api.post("/logout");
   },
 };
 

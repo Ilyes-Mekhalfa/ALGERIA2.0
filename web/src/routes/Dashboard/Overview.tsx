@@ -6,7 +6,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <StatsGrid />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <PriceChart />
         <div className="rounded-lg p-4 bg-white shadow-sm">
           <h3 className="text-lg font-semibold mb-2">Recent Activity</h3>
@@ -16,7 +16,7 @@ export default function DashboardPage() {
             <li>- Producer #12 added new listing: Potatoes</li>
           </ul>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

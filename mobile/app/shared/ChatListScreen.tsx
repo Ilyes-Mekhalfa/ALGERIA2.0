@@ -1,145 +1,140 @@
-import { DefaultEventsMap } from "@socket.io/component-emitter";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   FlatList,
+  TouchableOpacity,
 } from "react-native";
-// eslint-disable-next-line import/no-named-as-default
-import io, { Socket } from "socket.io-client";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ArrowLeft, SquarePen, Search } from "lucide-react-native";
+import { useRouter } from "expo-router";
 
-interface Message {
-  // MongoDB ID for saved messages
-  _id?: string;
-  id?: string;
-  text: string;
-  senderId: string;
-  chatRoomId: string;
-  // Add other properties like 'createdAt', 'time', etc.
-  [key: string]: any;
-}
+// --- MOCK DATA ---
+const MESSAGES = [
+  {
+    id: "1",
+    name: "user user",
+    message:
+      "Aliqua porttitor esse do minim mi quidem dis sum sum qui e sum saepe tota",
+    time: "2:30 PM",
+    unread: true,
+  },
+  {
+    id: "2",
+    name: "user user",
+    message:
+      "Aliqua porttitor esse do minim mi quidem dis sum sum qui e sum saepe tota",
+    time: "2:30 PM",
+    unread: true,
+  },
+  {
+    id: "3",
+    name: "user user",
+    message:
+      "Aliqua porttitor esse do minim mi quidem dis sum sum qui e sum saepe tota",
+    time: "2:30 PM",
+    unread: true,
+  },
+  {
+    id: "4",
+    name: "user user",
+    message:
+      "Aliqua porttitor esse do minim mi quidem dis sum sum qui e sum saepe tota",
+    time: "2:30 PM",
+    unread: true,
+  },
+  {
+    id: "5",
+    name: "user user",
+    message:
+      "Aliqua porttitor esse do minim mi quidem dis sum sum qui e sum saepe tota",
+    time: "2:30 PM",
+    unread: true,
+  },
+];
 
-const SOCKET_URL = "http://10.179.54.216:3000";
-const HTTP_URL = "http://10.179.54.216:3000";
-const TEST_ROOM_ID = "farmer_123_buyer_456";
-const SENDER_ID = "user_123";
-let socket: Socket<DefaultEventsMap, DefaultEventsMap>;
+const MessageCard = ({ item }: { item: (typeof MESSAGES)[0] }) => (
+  <TouchableOpacity
+    className="bg-white p-4 rounded-2xl mb-3 flex-row items-start"
+    activeOpacity={0.7}
+  >
+    {/* Avatar (Gray Circle) */}
+    <View className="w-12 h-12 bg-gray-300 rounded-full mr-3" />
 
-export default function ChatScreen() {
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
+    {/* Content Section */}
+    <View className="flex-1">
+      {/* Top Row: Name + Time + Dot */}
+      <View className="flex-row justify-between items-center mb-1">
+        <Text className="font-bold text-black text-base">{item.name}</Text>
 
-  useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const response = await fetch(
-          `${HTTP_URL}/api/messages/${TEST_ROOM_ID}`
-        );
-        const history = await response.json();
-
-        setMessages(history);
-        initializeSocket();
-      } catch (error) {
-        console.error("Failed to load chat history or connect:", error);
-      }
-    };
-
-    const initializeSocket = () => {
-      socket = io(SOCKET_URL);
-
-      socket.on("connect", () => {
-        // Join the room right after connecting
-        socket.emit("join_room", TEST_ROOM_ID);
-        console.log(`Socket connected and joined room: ${TEST_ROOM_ID}`);
-      });
-
-      // Listener for new real-time messages
-      socket.on("receive_message", (data) => {
-        console.log("Real-time message received:", data);
-        setMessages((previousMessages): any => [...previousMessages, data]);
-      });
-
-      // Ensure listeners are cleaned up
-      return () => {
-        socket.off("receive_message");
-        socket.disconnect();
-      };
-    };
-
-    fetchHistory();
-  }, []);
-
-  const sendMessage = async () => {
-    if (message.trim() === "") return;
-
-    const messageData = {
-      _id: Date.now().toString(),
-      text: message,
-      senderId: SENDER_ID,
-      chatRoomId: TEST_ROOM_ID,
-    };
-
-    socket.emit("send_message", messageData);
-
-    setMessages((list): any => [...list, messageData]);
-
-    setMessage("");
-  };
-
-  // This function decides how to render a single message
-  const renderItem = ({ item }: any) => {
-    const isMyMessage = item.sender === SENDER_ID;
-
-    return (
-      <View
-        className={`my-1 p-3 rounded-lg max-w-[80%] ${
-          isMyMessage
-            ? "bg-green-600 self-end mr-2" // My message (Right side, Green)
-            : "bg-gray-200 self-start ml-2" // Farmer message (Left side, Gray)
-        }`}
-      >
-        <Text className={isMyMessage ? "text-white" : "text-black"}>
-          {item.text}
-        </Text>
+        <View className="flex-row items-center gap-2">
+          <Text className="text-green-600 text-xs font-medium">
+            {item.time}
+          </Text>
+          {item.unread && (
+            <View className="w-2.5 h-2.5 bg-green-600 rounded-full" />
+          )}
+        </View>
       </View>
-    );
-  };
+
+      {/* Message Preview */}
+      <Text className="text-gray-500 text-sm leading-5" numberOfLines={2}>
+        {item.message}
+      </Text>
+    </View>
+  </TouchableOpacity>
+);
+
+const MessagesScreen = () => {
+  const router = useRouter();
+  const [search, setSearch] = useState("");
 
   return (
-    // Main Container
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="p-4 pt-12 bg-green-700 shadow-sm">
-        <Text className="text-white text-xl font-bold">Farmer John</Text>
+    <SafeAreaView className="flex-1 bg-[#F5FBF7]">
+      {/* --- HEADER --- 
+        Note: The screenshot has a faint vegetable pattern background.
+        If you have that image, wrap this View in an <ImageBackground>.
+      */}
+      <View className="px-5 pt-2 pb-4 bg-white rounded-b-[30px] shadow-sm mb-4">
+        {/* Top Navigation Row */}
+        <View className="flex-row justify-between items-center mb-6">
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="w-10 h-10 items-center justify-center rounded-full bg-white"
+          >
+            <ArrowLeft size={24} color="black" />
+          </TouchableOpacity>
+
+          <Text className="text-xl font-bold text-black">Messages</Text>
+
+          <TouchableOpacity className="w-10 h-10 items-center justify-center">
+            <SquarePen size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Search Bar */}
+        <View className="flex-row items-center bg-white border border-green-600/30 h-12 rounded-2xl px-4">
+          <Search size={20} color="gray" />
+          <TextInput
+            className="flex-1 ml-3 text-base text-black"
+            placeholder=""
+            value={search}
+            onChangeText={setSearch}
+          />
+        </View>
       </View>
 
-      {/* Message List */}
+      {/* --- MESSAGES LIST --- */}
       <FlatList
-        data={messages}
-        keyExtractor={(item) =>
-          item._id ? item._id.toString() : item.id!.toString()
-        }
-        renderItem={renderItem}
-        className="flex-1 p-2"
+        data={MESSAGES}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <MessageCard item={item} />}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
+        showsVerticalScrollIndicator={false}
       />
-
-      {/* Input Area */}
-      <View className="flex-row items-center p-3 bg-gray-100">
-        <TextInput
-          className="flex-1 bg-white p-3 rounded-full border border-gray-300 mr-2"
-          placeholder="Type a message..."
-          value={message}
-          onChangeText={setMessage}
-        />
-        <TouchableOpacity
-          onPress={sendMessage}
-          className="bg-green-700 p-3 rounded-full"
-        >
-          <Text className="text-white font-bold">Send</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </SafeAreaView>
   );
-}
+};
+
+export default MessagesScreen;
