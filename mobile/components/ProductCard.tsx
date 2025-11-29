@@ -8,7 +8,7 @@ import { Link } from "expo-router";
 const FALLBACK_IMAGE_URL =
   "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500";
 
-const ProductCard = ({ item }) => {
+const ProductCard = ({ item }: any) => {
   // --- 1. SAFETY CHECK FOR THE ENTIRE ITEM ---
   // If the item prop itself is missing, render nothing.
   if (!item) {

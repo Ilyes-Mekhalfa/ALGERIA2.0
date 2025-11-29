@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({
     <View className="flex-row items-center justify-between px-4 pt-2 pb-4">
       {/* LEFT SIDE — Avatar + Greeting */}
       <TouchableOpacity
-        onPress={onAvatarPress}
+        onPress={() => router.push("/profile/profile")}
         className="flex-row items-center"
       >
         <Image
