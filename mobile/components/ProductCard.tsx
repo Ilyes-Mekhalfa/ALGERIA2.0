@@ -1,55 +1,82 @@
-// components/ProductCard.js
-import { View, Text, Image, TouchableOpacity } from "react-native";
+// In components/ProductCard.js
+
 import React from "react";
-import { Feather } from "@expo/vector-icons";
+import { View, Text, Image, TouchableOpacity } from "react-native";
+import { Star } from "lucide-react-native";
+import { Link } from "expo-router";
 
-const ProductCard = ({ item }: any) => {
+const FALLBACK_IMAGE_URL =
+  "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500";
+
+const ProductCard = ({ item }) => {
+  // --- 1. SAFETY CHECK FOR THE ENTIRE ITEM ---
+  // If the item prop itself is missing, render nothing.
+  if (!item) {
+    return null;
+  }
+  // ------------------------------------------
+
+  // --- 2. CORRECTLY USE THE ITEM'S IMAGE URL ---
+  const imageUrl = FALLBACK_IMAGE_URL;
+  // ------------------------------------------
+
   return (
-    <View className="mt-3 flex-1 bg-white rounded-2xl p-4 shadow-md shadow-green-400 mx-1">
-      {/* Product Image */}
-      <Image
-        source={item.image} // Assuming local image require path
-        className="w-full h-32"
-        resizeMode="contain"
-      />
+    <Link href={`/product/${item._id}`} asChild>
+      <TouchableOpacity className="flex-1 bg-white rounded-2xl shadow-md overflow-hidden">
+        <View className="flex-1 bg-white rounded-2xl shadow-md overflow-hidden">
+          {/* Image and Quality Badge */}
+          <View>
+            <Image
+              source={{ uri: imageUrl }}
+              className="w-full h-32"
+              resizeMode="cover"
+            />
+            {/* Conditionally render the badge ONLY if quality exists */}
+            {item.quality && (
+              <View className="absolute top-2 right-2 flex-row items-center bg-yellow-400 px-2 py-1 rounded-full">
+                <Star size={12} color="#fff" fill="#fff" />
+                <Text className="text-white text-xs font-bold ml-1">
+                  {item.quality}
+                </Text>
+              </View>
+            )}
+          </View>
 
-      {/* Title and Status Badge */}
-      <View className="flex-row justify-between items-start mt-2">
-        <Text className="text-lg font-bold w-[60%]">{item.name}</Text>
-        <View
-          className={`px-3 py-1 rounded-full ${
-            item.status === "Active" ? "bg-[#D1F7E2]" : "bg-gray-100"
-          }`}
-        >
-          <Text
-            className={`text-xs font-semibold ${
-              item.status === "Active" ? "text-[#34C759]" : "text-gray-500"
-            }`}
-          >
-            {item.status}
-          </Text>
+          {/* Product Details Container */}
+          <View className="p-3 justify-between flex-1">
+            <View>
+              {/* --- 3. ADD FALLBACKS FOR ALL DATA --- */}
+              <Text
+                className="text-base font-bold text-gray-800"
+                numberOfLines={1}
+              >
+                {item.name || "Unnamed Product"}
+              </Text>
+              <Text className="text-xs text-gray-500 mt-1" numberOfLines={2}>
+                {item.description || "No description available."}
+              </Text>
+            </View>
+
+            <View className="mt-4">
+              <Text className="text-sm font-semibold text-gray-600">
+                {/* Using the Nullish Coalescing operator (??) is best for numbers */}
+                Available: {item.stock ?? 0} {item.unit || ""}
+              </Text>
+              <Text className="text-xl font-extrabold text-green-700 mt-1">
+                {item.price ?? 0} DZD
+              </Text>
+            </View>
+            {/* -------------------------------------- */}
+
+            <TouchableOpacity className="bg-green-700 py-2.5 rounded-lg mt-4">
+              <Text className="text-white font-bold text-center">
+                View Details
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-
-      {/* Quantity */}
-      <Text className="text-gray-500 mt-2">{item.quantity}</Text>
-
-      {/* Footer: Date and Actions */}
-      <View className="flex-row justify-between items-center mt-4">
-        <Text className="text-gray-400 text-xs w-[50%]">{item.date}</Text>
-
-        <View className="flex-row gap-2">
-          {/* Delete Button */}
-          <TouchableOpacity className="w-9 h-9 border border-red-100 rounded-full justify-center items-center">
-            <Feather name="trash-2" size={18} color="#FF3B30" />
-          </TouchableOpacity>
-          {/* Edit Button */}
-          <TouchableOpacity>
-            <Feather name="edit" size={20} color="black" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
+      </TouchableOpacity>
+    </Link>
   );
 };
 

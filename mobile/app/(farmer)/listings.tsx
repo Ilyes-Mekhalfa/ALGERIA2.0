@@ -16,7 +16,7 @@ import Header from "@/components/Header";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/providers/AuthProvider"; // Import your useAuth hook
 
-const filterTabs = ["Active", "Draft", "Completed"];
+const filterTabs = ["Active", "Completed"];
 
 const Listings = () => {
   const router = useRouter();
@@ -62,6 +62,8 @@ const Listings = () => {
 }, [user]);
   const renderContent = () => {
     if (loading) {
+        
+
       return (
         <ActivityIndicator size="large" color="#50C878" className="mt-16" />
       );
@@ -117,7 +119,7 @@ const Listings = () => {
         </TouchableOpacity>
       </View>
 
-      <View className="flex-row justify-between px-5 mb-4">
+      <View className="flex-row justify-evenly items-center px-5 mb-4">
         {filterTabs.map((tab) => {
           const isActive = activeTab === tab;
           return (
