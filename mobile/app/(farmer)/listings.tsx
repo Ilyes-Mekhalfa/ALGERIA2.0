@@ -31,35 +31,35 @@ const Listings = () => {
   // ---------------------------------------------------
 
   useEffect(() => {
-  if (!user) {
-    setLoading(false);
-    setProducts([]);
-    return;
-  }
-
-  const fetchMyProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      console.log("FRONTEND: Requesting products for user ID:", user.id);
-
-      // --- THIS IS THE FIX ---
-      // Pass the user.id directly as an argument to the service function.
-      const response = await productService.getMyProducts(user.id);
-      // -----------------------
-      
-      setProducts(response || []);
-    } catch (err) {
-      console.error("Failed to fetch 'My Listings':", err);
-      setError("Could not load your products.");
-    } finally {
+    if (!user) {
       setLoading(false);
+      setProducts([]);
+      return;
     }
-  };
 
-  fetchMyProducts();
-}, [user]);
+    const fetchMyProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        console.log("FRONTEND: Requesting products for user ID:", user.id);
+
+        // --- THIS IS THE FIX ---
+        // Pass the user.id directly as an argument to the service function.
+        const response = await productService.getMyProducts(user.id);
+        // -----------------------
+
+        setProducts(response || []);
+      } catch (err) {
+        console.error("Failed to fetch 'My Listings':", err);
+        setError("Could not load your products.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMyProducts();
+  }, [user]);
   const renderContent = () => {
     if (loading) {
         
@@ -94,7 +94,7 @@ const Listings = () => {
         columnWrapperStyle={{ gap: 16 }}
         ListEmptyComponent={
           <Text className="text-center text-gray-500 mt-16">
-            You haven't listed any products yet.
+            You haven&apos;t listed any products yet.
           </Text>
         }
       />
@@ -106,7 +106,7 @@ const Listings = () => {
       <StatusBar barStyle="dark-content" />
 
       <Header />
-      <View className="flex-row justify-evenly items-center mt-6 mb-8 px-5">
+      <View className="flex-row justify-between items-center mt-6 mb-8 px-5">
         <Text className="text-3xl font-extrabold">My Listings</Text>
         <TouchableOpacity
           className="flex-row items-center bg-[#50C878] px-5 py-3 rounded-full shadow-md"
@@ -126,10 +126,10 @@ const Listings = () => {
             <TouchableOpacity
               key={tab}
               onPress={() => setActiveTab(tab)}
-              className={`px-8 py-3 rounded-full ${isActive ? "bg-[#FCD27B]" : "border-2 border-[#FCD27B] bg-[#FFFDF5]"}`}
+              className={`px-8 py-3 rounded-full ${isActive ? "bg-[#FCD27B]" : " bg-[#D8D8D8]"}`}
             >
               <Text
-                className={`font-bold ${isActive ? "text-white" : "text-[#FCD27B]"}`}
+                className={`font-bold ${isActive ? "text-white" : "text-[#808080]"}`}
               >
                 {tab}
               </Text>

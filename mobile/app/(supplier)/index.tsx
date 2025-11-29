@@ -1,5 +1,13 @@
-import { View, Text, FlatList, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  ScrollView,
+  ImageBackground,
+} from "react-native";
 import React, { useState } from "react";
+// Remove SafeAreaView here because ImageBackground usually needs to go to the very top edge
+// We will use padding or a SafeAreaView *inside* instead if needed, or just handle top padding manually.
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Header from "@/components/Header";
@@ -9,29 +17,48 @@ import CategoryPills from "@/components/CategoryPills";
 import ProductCard from "@/components/Ricently";
 import FarmerCard from "@/components/FarmerCard";
 
-// Import the real data files we create below
 import products from "@/lib/products";
 import farmers from "@/lib/farmers";
+import { router } from "expo-router";
 
 export default function Index() {
   const [searchText, setSearchText] = useState("");
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F6F8FA] mt-5">
+    <View className="flex-1 bg-[#F6F8FA]">
       <ScrollView
         showsVerticalScrollIndicator={false}
-        // 👇 This adds the spacing at the very bottom of the page
         contentContainerStyle={{ paddingBottom: 100 }}
+        // Important: Remove 'mt-5' or top margins on the scrollview so the image touches the top
+        className="flex-1"
       >
-        <Header />
+        {/* 1. ImageBackground MUST wrap the content you want 'on top' of the image.
+          2. It needs dimensions (width/height or padding).
+        */}
+        <ImageBackground
+          source={require("../../assets/images/Frame3384411.png")}
+          className="w-full pb-6 pt-12" // Add padding-top (pt-12) to account for status bar
+          resizeMode="cover"
+        >
+          {/* Header and SearchBar are now CHILDREN of ImageBackground */}
+          <View className="px-4">
+            <Header />
 
-        <SearchBar
-          value={searchText}
-          onChangeText={setSearchText}
-          placeholder="Search fresh products..."
-        />
+            <View className="mt-4">
+              <SearchBar
+                value={searchText}
+                onChangeText={setSearchText}
+                placeholder="Search fresh products..."
+                onPress={() => router.push("./search")}
+              />
+            </View>
+          </View>
+        </ImageBackground>
 
-        <HomeCarousel />
+        {/* The rest of your content continues below the background image */}
+        <View className="px-4 mt-6">
+          <HomeCarousel />
+        </View>
 
         {/* Categories */}
         <View className="mt-6">
@@ -75,11 +102,10 @@ export default function Index() {
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => <FarmerCard item={item} />}
             showsHorizontalScrollIndicator={false}
-            // 👇 Extra padding prevents shadows from clipping
             contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
+import { MapPin } from "lucide-react-native";
 
 type HeaderProps = {
   count?: number;
@@ -15,10 +16,6 @@ const Header: React.FC<HeaderProps> = ({
   onBellPress,
 }) => {
   const router = useRouter();
-
-  const onChatPress = () => {
-    router.push("/shared/chat");
-  };
 
   return (
     <View className="flex-row items-center justify-between px-4 pt-2 pb-4">
@@ -36,19 +33,17 @@ const Header: React.FC<HeaderProps> = ({
           <Text className="text-base font-semibold text-gray-900">
             Hi Mohamed 👋
           </Text>
-          <Text className="text-sm text-gray-500">
-            Ready to check contracts?
-          </Text>
+          <View className="flex-row items-center">
+            <MapPin size={16} color="#374151" />
+            <Text className="ml-1 text-gray-600 font-medium text-sm">
+              Blida
+            </Text>
+          </View>
         </View>
       </TouchableOpacity>
 
       {/* RIGHT SIDE — Chat + Bell */}
       <View className="flex-row items-center">
-        {/* CHAT ICON */}
-        <TouchableOpacity onPress={onChatPress} className="relative p-2 mr-2">
-          <Ionicons name="chatbubbles-outline" size={26} color="#333" />
-        </TouchableOpacity>
-
         {/* BELL ICON */}
         <TouchableOpacity onPress={onBellPress} className="relative">
           <Ionicons name="notifications-outline" size={26} color="#333" />
@@ -61,6 +56,13 @@ const Header: React.FC<HeaderProps> = ({
               <Text className="text-[10px] text-white font-bold">{count}</Text>
             </View>
           )}
+        </TouchableOpacity>
+        {/* CHAT ICON */}
+        <TouchableOpacity
+          onPress={() => router.push("/shared/ChatListScreen")}
+          className="relative p-2 ml-2"
+        >
+          <Ionicons name="chatbubbles-outline" size={26} color="#333" />
         </TouchableOpacity>
       </View>
     </View>

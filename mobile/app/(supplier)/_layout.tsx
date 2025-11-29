@@ -22,7 +22,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="search"
           options={{
-            title: "Search",
+            title: "Explore",
           }}
         />
         <Tabs.Screen
@@ -32,9 +32,10 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="profile"
+          name="cart"
           options={{
-            title: "Profile",
+            title: "Cart",
+            tabBarStyle: { display: "none" },
           }}
         />
       </Tabs>
