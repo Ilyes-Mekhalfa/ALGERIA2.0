@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 
 const Userschema = new mongoose.Schema({
     username : {
@@ -50,6 +51,25 @@ const Userschema = new mongoose.Schema({
     passwordResetTokenExpireIn : {
         type : Date,
     select : false  
+    },
+    // Referral system fields
+    referralCode: {
+        type: String,
+        unique: true,
+        index: true
+    },
+    referredBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
+        default: null
+    },
+    points: {
+        type: Number,
+        default: 0
+    },
+    referralsCount: {
+        type: Number,
+        default: 0
     },
 
 })

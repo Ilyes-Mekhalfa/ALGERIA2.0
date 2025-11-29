@@ -1,14 +1,58 @@
-// In your Register.js file
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Linking, ActivityIndicator } from 'react-native';
+import { useAuth } from '@/providers/AuthProvider';
+import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { ArrowRight, ArrowLeft, Check } from 'lucide-react-native';
+import * as Progress from 'react-native-progress';
 
-import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
-import { useAuth } from "@/providers/AuthProvider"; // <-- IMPORTANT: Import useAuth
+// --- Reusable, Styled Form Field Component ---
+const FormField = ({ label, value, onChangeText, placeholder, keyboardType = 'default', secureTextEntry = false }) => (
+  <View className="mb-8">
+    <Text className="text-base text-gray-500 mb-2">{label}</Text>
+    <TextInput
+      className="border-b-2 border-gray-200 p-2 text-lg text-gray-800"
+      value={value}
+      onChangeText={onChangeText}
+      placeholder={placeholder}
+      placeholderTextColor="#d1d5db"
+      keyboardType={keyboardType}
+      secureTextEntry={secureTextEntry}
+      autoCapitalize="none"
+    />
+  </View>
+);
+
+// --- Reusable, Styled Role Selection Button ---
+const RoleButton = ({ icon, label, isSelected, onPress }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    className={`w-[48%] items-center justify-center p-6 border-2 rounded-2xl ${isSelected ? 'bg-green-50 border-green-600' : 'bg-gray-50 border-gray-200'}`}
+  >
+    <Text className="text-5xl mb-2">{icon}</Text>
+    <Text className={`text-base font-bold ${isSelected ? 'text-green-800' : 'text-gray-700'}`}>{label}</Text>
+  </TouchableOpacity>
+);
+
+// --- Reusable, Styled Navigation Button ---
+const NavButton = ({ onPress, text, icon: Icon, disabled = false }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    disabled={disabled}
+    className={`flex-row items-center justify-center p-4 rounded-full ${disabled ? 'bg-gray-300' : 'bg-green-700'}`}
+  >
+    <Text className="text-white text-lg font-bold mr-2">{text}</Text>
+    {Icon && <Icon size={22} color="#fff" />}
+  </TouchableOpacity>
+);
 
 export default function Register() {
-  const  {register : RegisterUser }  = useAuth(); 
+  const { register: registerUser } = useAuth();
+  const router = useRouter();
 
   const [step, setStep] = useState(1);
-  // Form fields (no changes here)
+  const totalSteps = 4;
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,105 +61,149 @@ export default function Register() {
   const [location, setLocation] = useState("");
   const [role, setRole] = useState("");
 
-  const next = () => setStep(step + 1);
-  const back = () => setStep(step - 1);
+  const [loading, setLoading] = useState(false);
 
-  // --- THIS IS THE NEW SUBMIT HANDLER ---
+  const next = () => setStep(s => Math.min(s + 1, totalSteps));
+  const back = () => setStep(s => Math.max(s - 1, 1));
+
   const handleRegister = async () => {
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match.");
+      return;
+    }
+    setLoading(true);
     try {
-      // Create an object with all the user's data
       const userData = { username, email, password, confirmPassword, phone, location, role };
-      // Call the register function from our context
-      await RegisterUser(userData);
-      // Navigation will be handled by the context upon success
+      console.log("User Data:", userData);
+      await registerUser(userData);
+      // Navigation is handled by the context
     } catch (error) {
-      // If the API call fails, show an alert
       console.error("Registration failed:", error);
       Alert.alert("Registration Failed", "An error occurred. Please check your details and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <View>
+            <Text className="text-3xl font-extrabold text-gray-800 mb-2">Account Basics</Text>
+            <Text className="text-base text-gray-500 mb-10">Let's get you set up.</Text>
+            <FormField label="Your Name" value={username} onChangeText={setUsername} placeholder="John Doe" />
+            <FormField label="Email Address" value={email} onChangeText={setEmail} placeholder="you@example.com" keyboardType="email-address" />
+            <FormField label="Password" value={password} onChangeText={setPassword} placeholder="••••••••" secureTextEntry />
+            <FormField label="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword} placeholder="••••••••" secureTextEntry />
+          </View>
+        );
+      case 2:
+        return (
+          <View>
+            <Text className="text-3xl font-extrabold text-gray-800 mb-2">Personal Details</Text>
+            <Text className="text-base text-gray-500 mb-10">A little more about you.</Text>
+            <FormField label="Phone Number" value={phone} onChangeText={setPhone} placeholder="+1 (555) 000-0000" keyboardType="phone-pad" />
+            <FormField label="City / Location" value={location} onChangeText={setLocation} placeholder="e.g., Algiers" />
+          </View>
+        );
+      case 3:
+        return (
+          <View>
+            <Text className="text-3xl font-extrabold text-gray-800 mb-2">What's Your Role?</Text>
+            <Text className="text-base text-gray-500 mb-10">This helps us customize your experience.</Text>
+            <View className="flex-row flex-wrap justify-between gap-y-4">
+              <RoleButton icon="🛒" label="Buyer" isSelected={role === 'buyer'} onPress={() => setRole('buyer')} />
+              <RoleButton icon="🏪" label="Supplier" isSelected={role === 'supplier'} onPress={() => setRole('supplier')} />
+              <RoleButton icon="🌾" label="Farmer" isSelected={role === 'farmer'} onPress={() => setRole('farmer')} />
+              <RoleButton icon="🚚" label="Delivery" isSelected={role === 'delivery'} onPress={() => setRole('delivery')} />
+            </View>
+          </View>
+        );
+      case 4:
+        return (
+          <View>
+            <Text className="text-3xl font-extrabold text-gray-800 mb-2">Final Check</Text>
+            <Text className="text-base text-gray-500 mb-10">Does everything look correct?</Text>
+            <View className="p-5 border border-gray-200 rounded-2xl space-y-3 bg-gray-50">
+              <Text className="text-base"><Text className="font-bold">Name:</Text> {username}</Text>
+              <Text className="text-base"><Text className="font-bold">Email:</Text> {email}</Text>
+              <Text className="text-base"><Text className="font-bold">Phone:</Text> {phone}</Text>
+              <Text className="text-base"><Text className="font-bold">Role:</Text> {role}</Text>
+            </View>
+          </View>
+        );
+      default:
+        return null;
     }
   };
 
   return (
-    <ScrollView className="flex-1 bg-white p-6">
-      {/* Step Indicator (no changes) */}
-      <Text className="text-gray-500 mb-3">Step {step} of 4</Text>
-      <View className="w-full h-2 bg-gray-200 rounded-full mb-6">
-        <View
-          className="h-2 bg-blue-500 rounded-full"
-          style={{ width: `${(step / 4) * 100}%` }}
-        />
-      </View>
+    <SafeAreaView className="flex-1 bg-white">
+      <ScrollView contentContainerStyle={{ padding: 24, flexGrow: 1 }}>
+        
+        {/* Header and Progress Bar */}
+        <View className="mb-8">
+            <TouchableOpacity onPress={() => router.replace('/login')} className="mb-4">
+                <Text className="text-green-700 font-bold">← Back to Login</Text>
+            </TouchableOpacity>
+            <View className="flex-row justify-between items-center">
+                <Text className="text-sm font-bold text-gray-400">STEP {step} OF {totalSteps}</Text>
+            </View>
+            <Progress.Bar
+                progress={step / totalSteps}
+                width={null} // Makes it fill the container
+                height={6}
+                color={'#22c55e'} // Green-500
+                unfilledColor={'#e5e7eb'} // Gray-200
+                borderWidth={0}
+                className="mt-2"
+            />
+        </View>
 
-      {/* --- ALL STEPS 1, 2, and 3 are exactly the same. --- */}
-      {/* STEP 1 — Basic Info */}
-      {step === 1 && (
-        <View className="space-y-4">
-          <Text className="text-2xl font-bold">Create your account</Text>
-          <TextInput placeholder="Full name" value={username} onChangeText={setUsername} className="border p-3 rounded-xl"/>
-          <TextInput placeholder="Email" value={email} onChangeText={setEmail} className="border p-3 rounded-xl"/>
-          <TextInput placeholder="Password" value={password} secureTextEntry onChangeText={setPassword} className="border p-3 rounded-xl"/>
-          <TextInput placeholder="Confirm Password" value={confirmPassword} secureTextEntry onChangeText={setConfirmPassword} className="border p-3 rounded-xl"/>
-          <TouchableOpacity onPress={next} className="bg-blue-500 p-4 rounded-xl">
-            <Text className="text-center text-white font-semibold">Next</Text>
-          </TouchableOpacity>
+        {/* Dynamic Step Content */}
+        <View className="flex-1">
+          {renderStep()}
         </View>
-      )}
-      {/* STEP 2 — Personal Details */}
-      {step === 2 && (
-        <View className="space-y-4">
-          <Text className="text-2xl font-bold">Personal details</Text>
-          <TextInput placeholder="Phone number" value={phone} onChangeText={setPhone} className="border p-3 rounded-xl"/>
-          <TextInput placeholder="Location / City" value={location} onChangeText={setLocation} className="border p-3 rounded-xl"/>
-          <View className="flex-row justify-between mt-4">
-            <TouchableOpacity onPress={back} className="p-4"><Text>Back</Text></TouchableOpacity>
-            <TouchableOpacity onPress={next} className="bg-blue-500 p-4 rounded-xl"><Text className="text-white">Next</Text></TouchableOpacity>
-          </View>
-        </View>
-      )}
-      {/* STEP 3 — Role Selection */}
-      {step === 3 && (
-        <View className="space-y-4">
-          <Text className="text-2xl font-bold mb-2">Choose your role</Text>
-          {[{ id: "buyer", label: "Buyer", emoji: "🛒" }, { id: "seller", label: "Seller", emoji: "🏪" }, { id: "farmer", label: "Farmer", emoji: "🌾" }, { id: "delivery", label: "Delivery", emoji: "🚚" }].map((r) => (
-            <TouchableOpacity key={r.id} onPress={() => setRole(r.id)} className={`p-4 border rounded-xl flex-row items-center justify-between ${role === r.id ? "border-blue-500 bg-blue-50" : ""}`}>
-              <Text className="text-xl">{r.emoji} {r.label}</Text>
-              {role === r.id && <Text className="text-blue-500 font-semibold">Selected</Text>}
-            </TouchableOpacity>
-          ))}
-          <View className="flex-row justify-between mt-4">
-            <TouchableOpacity onPress={back} className="p-4"><Text>Back</Text></TouchableOpacity>
-            <TouchableOpacity disabled={!role} onPress={next} className={`p-4 rounded-xl ${role ? "bg-blue-500" : "bg-gray-300"}`}>
-              <Text className="text-white">Next</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
 
-      {/* --- THIS IS THE UPDATED FINAL STEP --- */}
-      {step === 4 && (
-        <View className="space-y-4">
-          <Text className="text-2xl font-bold mb-2">Review your information</Text>
-          <View className="p-4 border rounded-xl space-y-2 bg-gray-50">
-            <Text><Text className="font-bold">Name:</Text> {username}</Text>
-            <Text><Text className="font-bold">Email:</Text> {email}</Text>
-            <Text><Text className="font-bold">Phone:</Text> {phone}</Text>
-            <Text><Text className="font-bold">Location:</Text> {location}</Text>
-            <Text><Text className="font-bold">Role:</Text> {role}</Text>
-          </View>
-          <View className="flex-row justify-between mt-4">
-            <TouchableOpacity onPress={back} className="p-4">
-              <Text>Back</Text>
+        {/* Navigation Buttons */}
+        <View className="mt-10">
+          {step > 1 && (
+            <TouchableOpacity onPress={back} className="absolute bottom-6 left-0">
+              <View className="flex-row items-center">
+                <ArrowLeft size={20} color="#6b7280" />
+                <Text className="text-gray-500 font-bold text-base ml-1">Back</Text>
+              </View>
             </TouchableOpacity>
-            {/* This button now calls our handleRegister function */}
+          )}
+
+          {step < totalSteps && (
+            <View className="items-end">
+              <TouchableOpacity onPress={next} className="bg-green-700 w-16 h-16 rounded-full items-center justify-center">
+                <ArrowRight size={32} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {step === totalSteps && (
             <TouchableOpacity
               onPress={handleRegister}
-              className="bg-green-600 p-4 rounded-xl"
+              disabled={loading}
+              className={`flex-row items-center justify-center p-4 rounded-full ${loading ? 'bg-green-400' : 'bg-green-700'}`}
             >
-              <Text className="text-white font-semibold">Create Account</Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <>
+                  <Text className="text-white text-lg font-bold mr-2">Create Account</Text>
+                  <Check size={22} color="#fff" />
+                </>
+              )}
             </TouchableOpacity>
-          </View>
+          )}
         </View>
-      )}
-    </ScrollView>
+        
+      </ScrollView>
+    </SafeAreaView>
   );
 }

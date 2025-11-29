@@ -34,7 +34,7 @@ export default function PriceChart() {
   };
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-sm border h-64">
+    <div className="p-4 bg-white rounded-lg shadow-sm h-64">
       <h3 className="text-lg font-semibold mb-2">Price Trends</h3>
       <div className="w-full h-[calc(100%-2rem)]">
         <Line data={data} options={options} />

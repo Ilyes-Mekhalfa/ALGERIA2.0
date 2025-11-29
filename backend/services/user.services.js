@@ -1,9 +1,10 @@
 import User from '../models/user.model.js';
 import AppError from '../utils/appError.js';
 import  {generateToken}  from '../utils/jwt.js';
+import crypto from 'crypto';
 
 class UserService {
-    async register({ username, email, password }) {
+    async register({ username, email, password, referralCode }) {
     // Check if user already exists
     const existingUser = await User.findOne({ email});
 
@@ -12,12 +13,32 @@ class UserService {
     }
     
 
-    // Create new user
-    const user = await User.create({
+    // Generate a unique referral code for the new user
+    let newReferralCode = crypto.randomBytes(4).toString('hex');
+    // avoid rare collision
+    while (await User.findOne({ referralCode: newReferralCode })) {
+      newReferralCode = crypto.randomBytes(4).toString('hex');
+    }
+
+    // Prepare new user payload
+    const newUserPayload = {
       username,
       email,
-      password
-    });
+      password,
+      referralCode: newReferralCode
+    };
+
+    // If a referral code was provided, attempt to link to referrer
+    let referrer = null;
+    if (referralCode) {
+      referrer = await User.findOne({ referralCode: referralCode });
+      if (referrer) {
+        newUserPayload.referredBy = referrer._id;
+      }
+    }
+
+    // Create new user
+    const user = await User.create(newUserPayload);
     console.log(process.env.JWT_SECRET);
     
     // Generate JWT token
@@ -26,6 +47,18 @@ class UserService {
       email: user.email,
       role: user.role
     });
+
+    // If we have a referrer, credit them 20 points and increment referralsCount
+    if (referrer) {
+      referrer.points = (referrer.points || 0) + 20;
+      referrer.referralsCount = (referrer.referralsCount || 0) + 1;
+      try {
+        await referrer.save();
+      } catch (e) {
+        // non-fatal: don't block registration if saving referrer fails
+        console.warn('Failed to update referrer points:', e.message);
+      }
+    }
 
     return {
       user: {
@@ -106,11 +139,7 @@ class UserService {
     return user
   }
   async updateUser(userId, updates) {
-    // Remove fields that shouldn't be updated directly
-    delete updates.password;
-    delete updates.role;
-    delete updates.email;
-
+    
     const user = await User.findByIdAndUpdate(
       userId,
       { $set: updates },
@@ -134,36 +163,8 @@ class UserService {
     return { message: 'User deleted successfully' };
   }
 
-  async getAllUsers({ page, limit, search }) {
-    const query = search 
-      ? { 
-          $or: [
-            { username: { $regex: search, $options: 'i' } },
-            { email: { $regex: search, $options: 'i' } }
-          ]
-        }
-      : {};
-
-    const skip = (page - 1) * limit;
-
-    const [users, total] = await Promise.all([
-      User.find(query)
-        .select('-password')
-        .skip(skip)
-        .limit(parseInt(limit))
-        .sort({ createdAt: -1 }),
-      User.countDocuments(query)
-    ]);
-
-    return {
-      users,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(total / limit),
-        totalUsers: total,
-        limit: parseInt(limit)
-      }
-    };
+  async getAllUsers() {
+    return await User.find();
   }
 }
 

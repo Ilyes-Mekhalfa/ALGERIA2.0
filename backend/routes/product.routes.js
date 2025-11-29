@@ -5,17 +5,17 @@ const router = express.Router()
 
 router
      .route('/')
-     .get(productController.getAllProduct)
-     .post(productController.createProduct)
+     .get(authenticate , productController.getAllProduct)
+     .post(authenticate , productController.createProduct)
 
 router
     .route('/my-products/:id')
-    .get(productController.getMyProducts)
+    .get(authenticate , productController.getMyProducts)
 router
     .route('/:id')
-    .get( productController.getProduct)
-    .patch( productController.updateProduct)
-    .delete( productController.deleteProduct)
+    .get( authenticate, productController.getProduct)
+    .patch( authenticate, productController.updateProduct)
+    .delete( authenticate, productController.deleteProduct)
 
 
 export default router

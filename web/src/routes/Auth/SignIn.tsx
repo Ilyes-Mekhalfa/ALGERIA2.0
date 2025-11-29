@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
+import useAuthStore from "../../store/authStore";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -7,6 +9,7 @@ export default function SignInPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const setUser = useAuthStore((s) => s.setUser);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,28 +17,22 @@ export default function SignInPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch("/api/auth/signin", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ email, password }),
-      // });
-
-      // Simulated authentication - remove this in production
-      if (email && password.length >= 6) {
-        localStorage.setItem("authToken", "mock-token");
+      const res = await api.login(email, password);
+      const user = res?.data;
+      if (user) {
+        setUser(user);
         navigate("/admin/dashboard");
       } else {
-        setError("Invalid email or password");
+        setError("Invalid credentials");
       }
-    } catch (err) {
-      setError("An error occurred during sign in");
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "An error occurred during sign in";
+      setError(msg);
       console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen bg-linear-to-br from-primary/10 to-primary/5 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
@@ -93,14 +90,14 @@ export default function SignInPage() {
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
             Don't have an account?{" "}
-            <a href="/auth/signup" className="text-primary font-semibold hover:underline">
+            <a href="/signup" className="text-primary font-semibold hover:underline">
               Sign Up
             </a>
           </p>
         </div>
 
         <div className="mt-4 text-center">
-          <a href="/auth/forgot-password" className="text-primary text-sm hover:underline">
+          <a href="/forgot-password" className="text-primary text-sm hover:underline">
             Forgot password?
           </a>
         </div>
