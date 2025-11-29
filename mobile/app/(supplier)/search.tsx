@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,17 +8,62 @@ import {
   FlatList,
   StatusBar,
   TextInput,
-  ActivityIndicator,
 } from "react-native";
 import { Star, Plus } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchBar from "@/components/SearchBar"; // Assuming you have this component
 
-// Import your centralized API service
-import productService from "../../services/productServices"; // Adjust path as needed
+// --- MOCK DATA SECTION ---
 
-// --- MOCK DATA FOR OTHER SECTIONS ---
+const MOCK_PRODUCTS = [
+  { 
+    _id: "1", 
+    name: "Fresh Apples", 
+    farmerName: "Green Valley", 
+    rating: 4.8, 
+    price: 250, 
+    stock: 120, 
+    unit: 'kg', 
+    quality: 'A', 
+    imageUrl: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=500' 
+  },
+  { 
+    _id: "2", 
+    name: "Organic Tomatoes", 
+    farmerName: "Sunnyside Farm", 
+    rating: 4.9, 
+    price: 180, 
+    stock: 80, 
+    unit: 'kg', 
+    quality: 'Organic', 
+    imageUrl: 'https://images.unsplash.com/photo-1561155628-d2e4b830bba3?w=500' 
+  },
+  { 
+    _id: "3", 
+    name: "Fresh Milk", 
+    farmerName: "Happy Cow Dairy", 
+    rating: 4.7, 
+    price: 90, 
+    stock: 40, 
+    unit: 'Liter', 
+    // This product has no quality to test the conditional rendering
+    imageUrl: 'https://images.unsplash.com/photo-1559598467-f8b76c8155d0?w=500' 
+  },
+  { 
+    _id: "4", 
+    name: "Crisp Potatoes", 
+    farmerName: "Earthly Goods", 
+    rating: 4.6, 
+    price: 60, 
+    stock: 200, 
+    unit: 'kg', 
+    quality: 'B', 
+    imageUrl: 'https://images.unsplash.com/photo-1518977676601-b53f82aba657?w=500'
+  },
+];
+
 const FILTERS = ["Most ordered", "Organic", "In stock", "Rating 4.0+"];
+
 const CATEGORIES = [
   { id: "1", name: "Fruits", color: "bg-orange-100", icon: "🍎" },
   { id: "2", name: "Vegetables", color: "bg-green-100", icon: "🥦" },
@@ -26,17 +71,13 @@ const CATEGORIES = [
   { id: "4", name: "Meat", color: "bg-red-100", icon: "🥩" },
 ];
 
-const FALLBACK_IMAGE_URL = "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=300&q=80";
+const FALLBACK_IMAGE_URL = "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500";
 
-// --- REUSABLE COMPONENTS ---
+// --- REUSABLE COMPONENTS (defined within the file for completeness) ---
 
-// Updated ProductCard to safely handle backend data
 const ProductCard = ({ item }) => {
-  if (!item) return null; // Safety check for bad data
-
-  // Use the item's imageUrl or a fallback
+  if (!item) return null;
   const imageUrl = item.imageUrl || FALLBACK_IMAGE_URL;
-
   return (
     <View className="bg-white rounded-3xl p-3 mr-4 w-44 shadow-sm border border-gray-100">
       <Image
@@ -46,7 +87,6 @@ const ProductCard = ({ item }) => {
       />
       <Text className="text-lg font-bold text-black mb-1" numberOfLines={1}>{item.name || "Product"}</Text>
       <View className="flex-row items-center mb-3">
-        {/* Placeholder for farmer avatar */}
         <View className="w-6 h-6 bg-gray-300 rounded-full mr-2" />
         <View>
           <Text className="text-xs text-gray-800 font-medium">{item.farmerName || "Farmer"}</Text>
@@ -85,50 +125,6 @@ const FilterChip = ({ label }) => (
 const SearchScreen = () => {
   const [query, setQuery] = useState("");
 
-  // State for products, loading, and errors
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Fetch data from the API when the component mounts
-  useEffect(() => {
-    const fetchAllProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await productService.getAllProducts();
-        setProducts(response || []); // Ensure response is an array
-      } catch (err) {
-        console.error("Failed to fetch products for search screen:", err);
-        setError("Could not load products at this time.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAllProducts();
-  }, []);
-
-  // Conditionally render the product list based on state
-  const renderProductList = () => {
-    if (loading) {
-      return <ActivityIndicator size="large" color="#50C878" className="h-48" />;
-    }
-    if (error) {
-      return <Text className="text-center text-red-500 h-48 px-4">{error}</Text>;
-    }
-    return (
-      <FlatList
-        data={products}
-        renderItem={({ item }) => <ProductCard item={item} />}
-        keyExtractor={(item) => item._id}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        ListEmptyComponent={<Text className="text-center text-gray-500">No products available.</Text>}
-        contentContainerStyle={{ paddingHorizontal: 5, paddingRight: 20 }}
-      />
-    );
-  };
-
   return (
     <SafeAreaView className="flex-1 bg-green-50/30">
       <StatusBar barStyle="dark-content" />
@@ -152,12 +148,19 @@ const SearchScreen = () => {
           </ScrollView>
         </View>
 
-        {/* Section 1: All Products from API */}
+        {/* Section 1: Products (from Mock Data) */}
         <View className="mb-8">
           <Text className="text-xl font-bold text-black mb-4">
             Fresh on the Market
           </Text>
-          {renderProductList()}
+          <FlatList
+            data={MOCK_PRODUCTS}
+            renderItem={({ item }) => <ProductCard item={item} />}
+            keyExtractor={(item) => item._id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 5, paddingRight: 20 }}
+          />
         </View>
 
         {/* Section 2: Suggested Categories */}

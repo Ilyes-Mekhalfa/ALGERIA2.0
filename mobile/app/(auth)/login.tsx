@@ -46,9 +46,8 @@ export default function LoginScreen() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Redirect if already logged in
-  if (!user) {
-    return <Redirect href="/(driver)" />;
+  if (user) {
+    return <Redirect href="/(farmer)" />;
   }
 
   // The login logic remains the same

@@ -42,21 +42,21 @@ export default function Index() {
       setLoadingRecs(true);
       setErrorRecs(null);
       try {
-        const userLocation = user.location || 'algiers';
+        const userLocation = user.wilaya || "algiers";
         const criteria = {
           wilaya: userLocation,
           min_quantity: 1,
           count: 10,
         };
 
-        const response = await recommendationService.getUserRecommendations(criteria);
-        
+        const response =
+          await recommendationService.getUserRecommendations(criteria);
+
         // --- THIS IS THE FIX ---
         // Your data is nested inside a 'data' property in the response.
         console.log(response);
         setRecommendedProducts(response || []);
         // -----------------------
-
       } catch (err) {
         console.error("Failed to fetch recommendations:", err);
         setErrorRecs("Could not load recommendations.");
@@ -70,10 +70,14 @@ export default function Index() {
 
   const renderRecommendedList = () => {
     if (loadingRecs) {
-      return <ActivityIndicator size="large" color="#64C27B" className="h-48" />;
+      return (
+        <ActivityIndicator size="large" color="#64C27B" className="h-48" />
+      );
     }
     if (errorRecs) {
-      return <Text className="text-center text-red-500 h-48 px-4">{errorRecs}</Text>;
+      return (
+        <Text className="text-center text-red-500 h-48 px-4">{errorRecs}</Text>
+      );
     }
     return (
       <FlatList
@@ -82,8 +86,12 @@ export default function Index() {
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => <CustomCard item={item} />}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16,  }}
-        ListEmptyComponent={<Text className="text-center text-gray-500">No recommendations for you yet.</Text>}
+        contentContainerStyle={{ paddingHorizontal: 16 }}
+        ListEmptyComponent={
+          <Text className="text-center text-gray-500">
+            No recommendations for you yet.
+          </Text>
+        }
       />
     );
   };
@@ -96,24 +104,40 @@ export default function Index() {
         className="flex-1"
       >
         {/* --- Header & Other Sections (No change) --- */}
-        <ImageBackground source={require("../../assets/images/Frame3384411.png")} className="w-full pb-6 pt-12" resizeMode="cover">
+        <ImageBackground
+          source={require("../../assets/images/Frame3384411.png")}
+          className="w-full pb-6 pt-12"
+          resizeMode="cover"
+        >
           <View className="px-4">
             <Header />
             <View className="mt-4">
-              <SearchBar value={searchText} onChangeText={setSearchText} placeholder="Search fresh products..." onPress={() => router.push("./search")} />
+              <SearchBar
+                value={searchText}
+                onChangeText={setSearchText}
+                placeholder="Search fresh products..."
+                onPress={() => router.push("./search")}
+              />
             </View>
           </View>
         </ImageBackground>
-        <View className="px-4 mt-6"><HomeCarousel /></View>
+        <Text className="text-2xl font-bold ml-4">Most Popular</Text>
+        <View className="px-4 mt-2">
+          <HomeCarousel />
+        </View>
         <View className="mt-6">
-          <Text className="text-lg font-semibold px-4 text-black mb-4">Shop By Categories</Text>
+          <Text className="text-lg font-semibold px-4 text-black mb-4">
+            Shop By Categories
+          </Text>
           <CategoryPills />
         </View>
 
         {/* --- Recommended Products Section (Now uses live data with the new card) --- */}
         <View className="mt-7">
           <View className="flex-row justify-between items-center px-4 mb-3">
-            <Text className="text-lg font-semibold text-black">Recommended For You</Text>
+            <Text className="text-lg font-semibold text-black">
+              Recommended For You
+            </Text>
             <Text className="text-[#64C27B] font-medium">View all</Text>
           </View>
           {renderRecommendedList()}
@@ -122,7 +146,9 @@ export default function Index() {
         {/* --- Recently Listed Section (Still uses mock data but with the new card style) --- */}
         <View className="mt-7">
           <View className="flex-row justify-between items-center px-4 mb-3">
-            <Text className="text-lg font-semibold text-black">Recently Listed</Text>
+            <Text className="text-lg font-semibold text-black">
+              Recently Listed
+            </Text>
             <Text className="text-[#64C27B] font-medium">View all</Text>
           </View>
           <FlatList
@@ -138,7 +164,9 @@ export default function Index() {
         {/* --- Best Farmers Section (No change) --- */}
         <View className="mt-7">
           <View className="flex-row justify-between items-center px-4 mb-3">
-            <Text className="text-lg font-semibold text-black">Best Farmers</Text>
+            <Text className="text-lg font-semibold text-black">
+              Best Farmers
+            </Text>
             <Text className="text-[#64C27B] font-medium">View all</Text>
           </View>
           <FlatList
