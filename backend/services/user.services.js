@@ -105,7 +105,8 @@ class UserService {
         username: user.username,
         email: user.email,
         role: user.role,
-        lastLogin: user.lastLogin
+        lastLogin: user.lastLogin,
+        location: user.location
       },
       token
     };

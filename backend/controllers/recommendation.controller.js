@@ -8,7 +8,7 @@ export const getRankedRecommendations = catchError(async (req, res, next) => {
         wilaya, 
         min_quantity, 
         count = 10 
-    } = req.body;
+    } = req.query;
     const userId = req.user.id;
 
     if (!wilaya || !min_quantity) {
