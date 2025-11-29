@@ -86,6 +86,8 @@ export function useAuth() {
   return context;
 }
 
+
+
 export function useProtectedRoute() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -93,28 +95,28 @@ export function useProtectedRoute() {
   const navigationState = useRootNavigationState();
 
   useEffect(() => {
-    // Wait until the navigation state is ready and we're done loading the user.
+    // 1. Wait until navigation is fully ready and user loading is complete.
     if (!navigationState?.key || loading) {
       return;
     }
 
     const inAuthGroup = segments[0] === '(auth)';
+    
+    // --- THIS IS THE KEY CHANGE ---
+    // We need to know if the user is in ANY of the protected tab groups.
+    const inApp = segments[0] === '(farmer)' || segments[0] === '(buyer)';
+    // Add other roles here, e.g., || segments[0] === '(supplier)'
+    // ----------------------------
 
     if (!user && !inAuthGroup) {
-      // If the user is not signed in and the initial segment is not anything
-      // in the auth group, then redirect to the login page.
+      // If the user is not signed in and is trying to access anything
+      // other than the auth pages, redirect to login.
       router.replace('/(auth)/login');
-    } else if (user && inAuthGroup) {
-      // If the user is signed in and the initial segment is in the auth group,
-      // then redirect to the correct role-based tab group.
-      if (user.role === 'farmer') {
-        router.replace('/(farmer)');
-      } else if (user.role === 'buyer') {
-        router.replace('/(supplier)');
-      } else {
-        // Fallback if role is unknown
-        router.replace('/(auth)/login');
-      }
+    } else if (user && !inApp) {
+      // If the user IS signed in but is currently on a page
+      // that is NOT a protected app page (e.g., they are on the login page),
+      // redirect them to their correct home.
+      router.replace(`/${user.role === 'farmer' ? '(farmer)' : '(supplier)'}`); // Add more roles here
     }
   }, [user, segments, navigationState, loading, router]);
 }

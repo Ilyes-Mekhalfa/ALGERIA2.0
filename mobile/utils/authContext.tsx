@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
       }
       setLoading(false);
     };
-    
+
     loadUserFromStorage();
   }, []);
 
@@ -40,17 +40,36 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     const res = await api.post("/login", { email, password });
 
-    const token = res.data.token;
-    const user = res.data.user;
+    // Assuming your backend response is { data: { token: '...', user: {...} } }
+    // Adjust if your structure is different.
+    const token = res.data.data.token;
+    const user = res.data.data.user;
+    console.log(res.data);
 
-    // Defensive check
-    if (token ) {
+    // Defensive check to ensure both token and user object exist
+    if (token && typeof token === "string" && user && user.role) {
+      // Store the session data
       await SecureStore.setItemAsync("token", token);
       await SecureStore.setItemAsync("user", JSON.stringify(user));
+
+      // Update the global state
       setUser(user);
-      router.replace("/(farmer)"); // Or your main app route
+
+      // --- THIS IS THE DYNAMIC REDIRECT LOGIC ---
+      if (user.role === "farmer") {
+        router.replace("/(farmer)");
+      } else if (user.role === "buyer") {
+        router.replace("/(supplier)");
+      } else {
+        // Fallback: If role is unknown or missing, log out to be safe
+        console.warn(`Unknown user role: ${user.role}. Logging out.`);
+        // You might want to call your logout function here or redirect to a generic error page
+        router.replace("/(auth)/login");
+      }
+      // ------------------------------------------
     } else {
-      throw new Error("Login failed: Invalid response from server.");
+      // This error is thrown if the server's response is missing token, user, or role.
+      throw new Error("Login failed: Invalid or incomplete data from server.");
     }
   };
 
@@ -63,16 +82,16 @@ export function AuthProvider({ children }) {
       confirmPassword: userData.confirmPassword,
       role: userData.role,
     };
-    
-    const res = await api.post("/register", apiPayload);
 
+    const res = await api.post("/register", apiPayload);
+    
     // After a successful API call, get the token and user
     const token = res.data.token;
     console.log(token);
     const user = res.data.user;
 
     // Defensive Check: Ensure the token exists and is a string before saving
-    if (token && typeof token === 'string' && user) {
+    if (token && typeof token === "string" && user) {
       await SecureStore.setItemAsync("token", token);
       // Stringify the user object before saving
       await SecureStore.setItemAsync("user", JSON.stringify(user));
@@ -81,10 +100,12 @@ export function AuthProvider({ children }) {
       router.replace("/(farmer)"); // Or your main app route
     } else {
       // This will be thrown if the backend response is not what we expect
-      throw new Error("Registration succeeded but the server response was invalid.");
+      throw new Error(
+        "Registration succeeded but the server response was invalid."
+      );
     }
   };
-  
+
   // --- LOGOUT FUNCTION ---
   const logout = async () => {
     // Remove all session data from storage

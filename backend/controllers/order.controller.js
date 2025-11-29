@@ -22,9 +22,7 @@ export const getOrder = catchError(async (req , res , next)=>{
         order
     })
 })
-export const getMyOrders = catchError(async (req , res , next)=>{
-    
-})
+
 export const getAllOrders = catchError(async (req , res , next)=>{
     const orders = await OrderService.getAllOrders()
 
@@ -53,3 +51,23 @@ export const deleteOrder = catchError(async (req , res , next)=>{
         success : true
     })
 })
+
+
+ export const getMyOrders = catchError(async (req, res, next) => {
+  // --- THIS IS THE FIX ---
+  // Get the user ID from the authenticated token. It's trustworthy.
+  const userId = req.user.id; 
+  // -----------------------
+
+  // This check is good practice
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'Could not identify user from token.' });
+  }
+
+  const orders = await OrderService.findOrdersByUserId(userId);
+  
+  res.status(200).json({
+    success: true,
+    data: orders,
+  });
+});

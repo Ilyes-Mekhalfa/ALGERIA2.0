@@ -52,7 +52,8 @@ const ProductDetailsScreen = () => {
         // Your service might return the product directly or inside a `data` object.
         // Adjust as needed. Let's assume it returns the product directly for now.
         const response = await productService.getProductById(id);
-        setProduct(response);
+        console.log("Product details:", response);
+        setProduct(response.data);
       } catch (error) {
         console.error("Failed to fetch product details:", error);
         Alert.alert("Error", "Could not load product details.");
@@ -109,9 +110,9 @@ const ProductDetailsScreen = () => {
               className="w-12 h-12 rounded-full"
             />
             <View className="ml-4">
-              <Text className="text-sm text-gray-500">Sold by</Text>
+              <Text className="text-sm text-gray-500">Producer</Text>
               <Text className="text-lg font-bold text-gray-900">
-                {product.farmerName || "Anonymous Farmer"}
+                {product.userId.username || "Anonymous Farmer"}
               </Text>
             </View>
           </TouchableOpacity>
@@ -156,8 +157,8 @@ const ProductDetailsScreen = () => {
           </Text>
         </View>
         <TouchableOpacity className="bg-green-700 h-14 rounded-2xl flex-1 ml-4 flex-row items-center justify-center">
-          <ShoppingCart size={20} color="#fff" />
-          <Text className="text-white font-bold text-lg ml-2">Add to Cart</Text>
+          
+          <Text className="text-white font-bold text-lg ml-2">Edit</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

@@ -3,7 +3,7 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Star } from "lucide-react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 const FALLBACK_IMAGE_URL =
   "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500";
@@ -19,9 +19,10 @@ const ProductCard = ({ item }: any) => {
   // --- 2. CORRECTLY USE THE ITEM'S IMAGE URL ---
   const imageUrl = FALLBACK_IMAGE_URL;
   // ------------------------------------------
+  const router = useRouter();
 
   return (
-    <Link href={`/product/${item._id}`} asChild>
+    
       <TouchableOpacity className="flex-1 bg-white rounded-2xl shadow-md overflow-hidden">
         <View className="flex-1 bg-white rounded-2xl shadow-md overflow-hidden">
           {/* Image and Quality Badge */}
@@ -68,7 +69,7 @@ const ProductCard = ({ item }: any) => {
             </View>
             {/* -------------------------------------- */}
 
-            <TouchableOpacity className="bg-green-700 py-2.5 rounded-lg mt-4">
+            <TouchableOpacity onPress={() => router.push(`/product/${item._id}`)} className="bg-green-700 py-2.5 rounded-lg mt-4">
               <Text className="text-white font-bold text-center">
                 View Details
               </Text>
@@ -76,7 +77,6 @@ const ProductCard = ({ item }: any) => {
           </View>
         </View>
       </TouchableOpacity>
-    </Link>
   );
 };
 

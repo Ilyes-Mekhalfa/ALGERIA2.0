@@ -12,7 +12,7 @@ const OrderSchema = new mongoose.Schema({
         required : [true , 'seller is required field']
     },
     products : {
-        type : array,
+        type : Array,
         default: [],
         required : [true , 'at least should have a product']
     },
