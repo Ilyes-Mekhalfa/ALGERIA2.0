@@ -175,7 +175,7 @@ export default function SignUpPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#50c878]! text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Creating account..." : "Sign Up"}
           </button>
@@ -184,7 +184,7 @@ export default function SignUpPage() {
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
             Already have an account?{" "}
-            <a href="/signin" className="text-primary font-semibold hover:underline">
+            <a href="/login" className="text-[#50c878]! font-semibold hover:underline">
               Sign In
             </a>
           </p>
