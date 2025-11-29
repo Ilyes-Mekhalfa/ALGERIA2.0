@@ -5,11 +5,11 @@ import RecommendationService from '../services/recommendationService.js'
 export const getRankedRecommendations = catchError(async (req, res, next) => {
     // Collect user/query parameters    
     const { 
-        userId, 
         wilaya, 
         min_quantity, 
         count = 10 
     } = req.body;
+    const userId = req.user.id;
 
     if (!wilaya || !min_quantity) {
         return res.status(400).json({ success: false, message: 'Wilaya and minimum quantity are required for recommendations.' });

@@ -39,6 +39,12 @@ const Userschema = new mongoose.Schema({
         default : 'buyer',
         require : [true , 'role is required filed']
     },
+    wilaya : {
+        type : String,
+    },
+    adress : {
+        type : String,
+    },
     createAt :{
         type : Date,
         default : Date.now(),
