@@ -43,6 +43,7 @@ const rankListings = async (userWilaya, userMinQuantity, limit) => {
     // --- 3. Run Prediction Script (if available) ---
     let scores;
     try {
+        console.log('modelFeatures:', modelFeatures);
         scores = await runPythonPredictScript(modelFeatures);
     } catch (err) {
         console.warn('[Recommendation] Python predict script failed, using fallback scores:', err.message);
@@ -66,14 +67,16 @@ const rankListings = async (userWilaya, userMinQuantity, limit) => {
 
 async function runPythonPredictScript(features) {
     return new Promise((resolve, reject) => {
-        // Determine script path (try backend/scripts then scripts)
+        // Determine script path (try several likely locations relative to CWD and this service file)
         const candidateScriptPaths = [
-            path.join(process.cwd(), 'backend', 'scripts', 'predict.py'),
-            path.join(process.cwd(), 'scripts', 'predict.py'),
-            path.join(__dirname, 'scripts', 'predict.py')
+            path.join(process.cwd(), 'ml-models', 'recommender', 'predict.py'),
+            path.join(process.cwd(), 'backend', 'ml-models', 'recommender', 'predict.py'),
+            path.join(__dirname, '..', 'ml-models', 'recommender', 'predict.ipynb'),
+            path.join(__dirname, '..', '..', 'ml-models', 'recommender', 'predict.py')
         ];
 
         let scriptPath = null;
+        console.log('Looking for prediction script in paths:', candidateScriptPaths);
         for (const p of candidateScriptPaths) {
             try {
                 if (fs.existsSync(p)) {
@@ -88,7 +91,7 @@ async function runPythonPredictScript(features) {
         if (!scriptPath) {
             return reject(new Error('Prediction script not found.'));
         }
-
+        
         // Helper to validate python executable by checking --version
         function findPythonExecutable() {
             const envPath = process.env.PYTHON_EXECUTABLE;

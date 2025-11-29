@@ -55,8 +55,7 @@ export const getMyProducts = catchError(async (req , res , next)=>{
     })
 })
  export const getAllProduct = catchError (async (req , res ,next)=>{
-    const { page = 1, limit = 20 } = req.query;
-    const result = await ProductService.getAllProducts({ page, limit })
+    const result = await ProductService.getAllProducts()
 
     res.status(200).json({
         success: true,

@@ -139,11 +139,7 @@ class UserService {
     return user
   }
   async updateUser(userId, updates) {
-    // Remove fields that shouldn't be updated directly
-    delete updates.password;
-    delete updates.role;
-    delete updates.email;
-
+    
     const user = await User.findByIdAndUpdate(
       userId,
       { $set: updates },
@@ -167,36 +163,8 @@ class UserService {
     return { message: 'User deleted successfully' };
   }
 
-  async getAllUsers({ page, limit, search }) {
-    const query = search 
-      ? { 
-          $or: [
-            { username: { $regex: search, $options: 'i' } },
-            { email: { $regex: search, $options: 'i' } }
-          ]
-        }
-      : {};
-
-    const skip = (page - 1) * limit;
-
-    const [users, total] = await Promise.all([
-      User.find(query)
-        .select('-password')
-        .skip(skip)
-        .limit(parseInt(limit))
-        .sort({ createdAt: -1 }),
-      User.countDocuments(query)
-    ]);
-
-    return {
-      users,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(total / limit),
-        totalUsers: total,
-        limit: parseInt(limit)
-      }
-    };
+  async getAllUsers() {
+    return await User.find();
   }
 }
 

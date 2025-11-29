@@ -12,13 +12,8 @@ class ProductService {
 		return product;
 	}
 
-	async getAllProducts({ filter = {}, page = 1, limit = 20, sort = { createdAt: -1 } } = {}) {
-		const skip = (Number(page) - 1) * Number(limit);
-		const [items, total] = await Promise.all([
-			Product.find(filter).skip(skip).limit(Number(limit)).sort(sort),
-			Product.countDocuments(filter),
-		]);
-		return { items, total, page: Number(page), limit: Number(limit) };
+	async getAllProducts() {
+        return await Product.find()
 	}
 
 	async updateProduct(id, data) {

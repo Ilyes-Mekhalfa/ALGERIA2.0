@@ -11,13 +11,15 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="flex min-h-screen bg-muted/40">
+    <div className="min-h-screen bg-[#eefaf2] relative">
       <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
 
-      <div className="flex flex-col flex-1 min-w-0">
+  <div className={`flex flex-col flex-1 min-w-0 transition-all duration-300 ${isSidebarOpen ? "pl-64" : "pl-20"}`}>
         <Topbar />
-        <main className="p-6 flex-1 overflow-auto">
-          <Outlet />
+        <main className="p-6 flex-1 overflow-auto flex justify-center">
+          <div className="w-full max-w-7xl">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

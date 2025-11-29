@@ -24,6 +24,9 @@ export const register = catchError(async (req, res, next) => {
     //create the user
     const {user , token} = await UserService.register(req.body);
 
+    // Set token in Authorization header
+    res.set('Authorization', `Bearer ${token}`);
+
     return res.status(201).json({
         success: true,
         message: 'User registered successfully',
@@ -39,6 +42,7 @@ export const login = catchError(async (req, res, next)=>{
     // Validate login data
     const validationErrors = validateLoginData({ email, password });
     if (hasValidationErrors(validationErrors)) {
+
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -47,6 +51,9 @@ export const login = catchError(async (req, res, next)=>{
     }
 
     const {user , token} = await UserService.login({email , password})
+
+    // Set token in Authorization header
+    res.set('Authorization', `Bearer ${token}`);
 
     return res.status(200).json({
         success :true,
