@@ -52,20 +52,24 @@ export const deleteOrder = catchError(async (req , res , next)=>{
     })
 })
 
+export const getMyOrders = catchError(async (req, res, next) => {
+  // Get the user ID from the authenticated token.
+  const userId = req.params.id; 
 
- export const getMyOrders = catchError(async (req, res, next) => {
-  // --- THIS IS THE FIX ---
-  // Get the user ID from the authenticated token. It's trustworthy.
-  const userId = req.user.id; 
-  // -----------------------
+  // --- ADD THIS DEBUGGING LOG ---
+  console.log(`BACKEND: Searching for orders where buyer or seller ID is: "${userId}"`);
+  // ------------------------------
 
-  // This check is good practice
   if (!userId) {
     return res.status(401).json({ success: false, message: 'Could not identify user from token.' });
   }
 
-  const orders = await OrderService.findOrdersByUserId(userId);
+  const orders = await OrderService.findOrdersByUser(userId);
   
+  // --- ADD THIS LOG TO SEE THE RESULT ---
+  console.log(`BACKEND: Found ${orders.length} orders for this user.`);
+  // -------------------------------------
+
   res.status(200).json({
     success: true,
     data: orders,
