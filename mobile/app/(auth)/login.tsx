@@ -1,21 +1,28 @@
 import { useState } from "react";
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  ActivityIndicator, 
-  Alert, 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
   ImageBackground, // For the background image
-  ScrollView 
+  ScrollView,
 } from "react-native";
 import { Redirect, router } from "expo-router";
 import { useAuth } from "../../providers/AuthProvider"; // Make sure this path is correct
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Leaf, Mail, Lock } from 'lucide-react-native'; // Icons for the form
+import { Leaf, Mail, Lock } from "lucide-react-native"; // Icons for the form
 
 // --- A new, reusable FormField component styled like the design ---
-const FormField = ({ icon: Icon, value, onChangeText, placeholder, keyboardType = 'default', secureTextEntry = false }) => (
+const FormField = ({
+  icon: Icon,
+  value,
+  onChangeText,
+  placeholder,
+  keyboardType = "default",
+  secureTextEntry = false,
+}) => (
   <View className="flex-row items-center border-b-2 border-gray-200/50 p-2 mb-6">
     <Icon size={20} color="#fff" />
     <TextInput
@@ -33,15 +40,15 @@ const FormField = ({ icon: Icon, value, onChangeText, placeholder, keyboardType 
 
 export default function LoginScreen() {
   const { user, login } = useAuth();
-  
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Redirect if already logged in
-  if (user) {
-    return <Redirect href="/(farmer)" />;
+  if (!user) {
+    return <Redirect href="/(driver)" />;
   }
 
   // The login logic remains the same
@@ -64,26 +71,35 @@ export default function LoginScreen() {
 
   return (
     <ImageBackground
-      source={{ uri: 'https://images.unsplash.com/photo-1492944547225-a1c141507fb3?w=800' }}
+      source={{
+        uri: "https://images.unsplash.com/photo-1492944547225-a1c141507fb3?w=800",
+      }}
       className="flex-1"
       resizeMode="cover"
     >
       <SafeAreaView className="flex-1 bg-black/50">
-        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+        >
           <View className="p-8">
-            
             {/* Logo and Welcome Text */}
             <View className="items-center mb-10">
               <Leaf size={60} color="#22c55e" />
-              <Text className="text-4xl font-extrabold text-white mt-4">Welcome Back</Text>
-              <Text className="text-lg text-gray-300 mt-1">Login to your account</Text>
+              <Text className="text-4xl font-extrabold text-white mt-4">
+                Welcome Back
+              </Text>
+              <Text className="text-lg text-gray-300 mt-1">
+                Login to your account
+              </Text>
             </View>
 
             {/* Error Message */}
             {error ? (
-              <Text className="text-red-400 text-center mb-4 bg-red-900/50 p-2 rounded-lg">{error}</Text>
+              <Text className="text-red-400 text-center mb-4 bg-red-900/50 p-2 rounded-lg">
+                {error}
+              </Text>
             ) : null}
-            
+
             {/* Form Fields */}
             <FormField
               icon={Mail}
@@ -104,7 +120,9 @@ export default function LoginScreen() {
 
             {/* Forgot Password Link */}
             <TouchableOpacity className="self-end mb-6">
-              <Text className="text-gray-300 font-semibold">Forgot Password?</Text>
+              <Text className="text-gray-300 font-semibold">
+                Forgot Password?
+              </Text>
             </TouchableOpacity>
 
             {/* Login Button */}
@@ -116,7 +134,9 @@ export default function LoginScreen() {
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text className="text-white text-center font-bold text-lg">Login</Text>
+                <Text className="text-white text-center font-bold text-lg">
+                  Login
+                </Text>
               )}
             </TouchableOpacity>
 
@@ -127,7 +147,6 @@ export default function LoginScreen() {
                 <Text className="text-green-400 font-bold">Register</Text>
               </TouchableOpacity>
             </View>
-
           </View>
         </ScrollView>
       </SafeAreaView>
