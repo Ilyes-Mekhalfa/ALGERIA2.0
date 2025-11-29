@@ -268,7 +268,7 @@ const apiWrapper = {
   async login(email: string, password: string) {
     if (USE_MOCK) {
       await wait(500);
-      if (email === "admin@example.com" && password === "password") {
+      if (email === "admin1@gmail.com" && password === "secure789") {
         const mockToken = "mock-token-" + Date.now();
         localStorage.setItem("authToken", mockToken);
         return { data: { data: { id: 1, name: "Admin User", email, token: mockToken } } };

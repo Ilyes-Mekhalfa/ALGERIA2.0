@@ -190,7 +190,7 @@ export default function Topbar() {
                 console.error("logout error", e);
               }
               logoutStore();
-              navigate("/signin");
+              navigate("/login");
             }}
             className="ml-4 text-sm text-red-600 hover:underline"
           >

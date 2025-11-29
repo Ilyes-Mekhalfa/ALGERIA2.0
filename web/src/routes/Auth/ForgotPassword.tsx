@@ -113,7 +113,7 @@ export default function ForgotPasswordPage() {
       // Simulated - remove in production
       setSuccess("Password reset successfully! Redirecting to sign in...");
       setTimeout(() => {
-        navigate("/signin");
+        navigate("/login");
       }, 2000);
     } catch (err) {
       setError("An error occurred while resetting your password.");
@@ -167,7 +167,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#50c878]! text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Sending..." : "Send Verification Code"}
             </button>
@@ -211,7 +211,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#50c878]! text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Verifying..." : "Verify Code"}
             </button>
@@ -223,7 +223,7 @@ export default function ForgotPasswordPage() {
                 setError("");
                 setSuccess("");
               }}
-              className="w-full text-primary font-semibold py-2 px-4 rounded-lg hover:bg-primary/10 transition duration-200"
+              className="w-full text-[#50c878]! font-semibold py-2 px-4 rounded-lg hover:bg-primary/10 transition duration-200"
             >
               Back
             </button>
@@ -280,7 +280,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#50c878]! text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Resetting..." : "Reset Password"}
             </button>
@@ -292,7 +292,7 @@ export default function ForgotPasswordPage() {
                 setError("");
                 setSuccess("");
               }}
-              className="w-full text-primary font-semibold py-2 px-4 rounded-lg hover:bg-primary/10 transition duration-200"
+              className="w-full text-[#50c878]! font-semibold py-2 px-4 rounded-lg hover:bg-primary/10 transition duration-200"
             >
               Back
             </button>
@@ -303,7 +303,7 @@ export default function ForgotPasswordPage() {
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
             Remember your password?{" "}
-            <a href="/signin" className="text-primary font-semibold hover:underline">
+            <a href="/login" className="text-[#50c878]! font-semibold hover:underline">
               Sign In
             </a>
           </p>

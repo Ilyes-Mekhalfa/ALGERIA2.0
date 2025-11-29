@@ -93,7 +93,7 @@ export default function SignInPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#50c878]! text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary/90 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </button>
@@ -102,14 +102,14 @@ export default function SignInPage() {
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
             Don't have an account?{" "}
-            <a href="/signup" className="text-primary font-semibold hover:underline">
+            <a href="/signup" className="text-[#50c878]! font-semibold hover:underline">
               Sign Up
             </a>
           </p>
         </div>
 
         <div className="mt-4 text-center">
-          <a href="/forgot-password" className="text-primary text-sm hover:underline">
+          <a href="/forgot-password" className="text-[#50c878]! text-sm hover:underline">
             Forgot password?
           </a>
         </div>

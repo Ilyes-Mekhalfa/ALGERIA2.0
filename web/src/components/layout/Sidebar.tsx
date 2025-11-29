@@ -64,7 +64,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
   const handleLogout = () => {
     logout();
-    navigate("/signin");
+    navigate("/login");
   };
   return (
     <aside
