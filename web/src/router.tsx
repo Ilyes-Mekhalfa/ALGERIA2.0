@@ -23,7 +23,7 @@ export const router = createBrowserRouter([
   //   element: <RootRedirect />,
   // },
   {
-    path: "/signin",
+    path: "/login",
     element: <SignInPage />,
   },
   {

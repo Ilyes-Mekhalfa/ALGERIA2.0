@@ -12,6 +12,7 @@ export default function RequireAuth({ children }: Props) {
 
   if (!user) {
     // redirect to sign in, preserve the attempted URL
+    // return <Navigate to="/signin" state={{ from: location }} replace />;
     return <Navigate to="/signin" state={{ from: location }} replace />;
   }
 
