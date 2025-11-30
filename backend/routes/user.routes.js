@@ -17,6 +17,6 @@ router
 
 router
      .route('/allUsers')
-     .get(authenticate , authorize('admin') , userController.getAllUsers)
+     .get(authenticate  , userController.getAllUsers)
 
 export default router

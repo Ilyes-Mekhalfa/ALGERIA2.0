@@ -1,3 +1,4 @@
+import { ref } from 'process';
 import User from '../models/user.model.js';
 import AppError from '../utils/appError.js';
 import  {generateToken}  from '../utils/jwt.js';
@@ -168,6 +169,15 @@ class UserService {
 
   async getAllUsers() {
     return await User.find();
+  }
+  async affiliateRegister(referralCode , userData){
+    const referrer = await User.findOne({referralCode : referralCode , email : userData.email})
+    if(!referrer){
+      throw new AppError('invalid referral code', 400)
+    }
+    referrer.points += 20;
+    referrer.referralsCount += 1;
+    await referrer.save();
   }
 }
 
