@@ -98,7 +98,7 @@ const AddProductScreen = () => {
       await productService.createProduct(productData);
 
       Alert.alert("Success!", "Your product has been published.", [
-        { text: "OK", onPress: () => router.back() },
+        { text: "OK", onPress: () => router.replace('/(farmer)') },
       ]);
     } catch (error) {
       console.error("Failed to create product:", error);
